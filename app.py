@@ -81,6 +81,7 @@ def parse_molecular_report(uploaded_file):
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
+        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -96,8 +97,6 @@ def parse_molecular_report(uploaded_file):
             debug_log = "--- PDF PARSING LOG ---\n"
             full_ocr_text = ""
             
-            # This regex is designed to be flexible for OCR'd text.
-            # It finds a gene, then looks for the first word-like string after "variant" as the alteration.
             line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense)\s+variant\s+(?:Details\s+)?([^\s,]+)')
 
             with pdfplumber.open(file_bytes) as pdf:
@@ -108,11 +107,8 @@ def parse_molecular_report(uploaded_file):
                     if not page_text or page_text.strip() == "":
                         debug_log += f"Page {i+1}: No text extracted. Attempting OCR...\n"
                         try:
-                            # **IMPROVED OCR:** Pre-process the image for better accuracy.
                             img = page.to_image(resolution=300).original
-                            # Convert to grayscale
                             img = img.convert('L')
-                            # Increase contrast
                             enhancer = ImageEnhance.Contrast(img)
                             img = enhancer.enhance(2)
                             
@@ -132,7 +128,6 @@ def parse_molecular_report(uploaded_file):
                             gene = match.group(1)
                             alteration = match.group(2)
                             
-                            # Clean up common OCR artifacts
                             if 'p.' in alteration.lower():
                                 alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
                             
@@ -203,12 +198,11 @@ def display_oncokb_results(data, hugo_symbol, alteration):
         for treatment in data.get('treatments', []):
             drugs = ", ".join([d['drugName'] for d in treatment['drugs']])
             level = treatment['level'].replace('_', ' ')
-            color = get_level_class(treatment['level'])
             indication = treatment.get('indication', {}).get('name', 'N/A')
             pmids = ", ".join([f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})" for pmid in treatment.get('pmids', [])])
             
             st.markdown(f"**{drugs}** - `{indication}`")
-            st.markdown(f"> :rainbow[{level}] - {pmids}")
+            st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
 
 # --- Main App ---
 st.title("OncoKB Batch Variant Querier")
@@ -230,49 +224,61 @@ if st.sidebar.button("Process Variants", type="primary"):
         # Parse NCCN data
         nccn_data = parse_nccn_file(nccn_file)
         
-        # Parse molecular report
-        df, debug_log = parse_molecular_report(report_file)
-        
-        if df is None or df.empty:
-            st.error("Could not parse any variants from the molecular report.")
-            if debug_log:
-                st.subheader("PDF Parsing Debug Log")
-                st.text_area("Log", debug_log, height=300)
+        # Check the return from the parser before unpacking to prevent TypeError
+        parsing_result = parse_molecular_report(report_file)
+        if parsing_result is None:
+            st.error("The file parser returned an unexpected error. Please check the console for more details.")
         else:
-            st.success(f"Successfully parsed {len(df)} variants from the report.")
+            df, debug_log = parsing_result
             
-            # --- OncoKB Results Section ---
-            st.header("OncoKB Results")
-            with st.spinner("Querying OncoKB for all variants..."):
-                for index, row in df.iterrows():
-                    gene = row['Gene']
-                    alt = row['Alteration']
-                    with st.expander(f"**{gene} p.{alt}**", expanded=(index == 0)):
-                        data = get_oncokb_data(gene, alt, tumor_type, api_token)
-                        display_oncokb_results(data, gene, alt)
-            
-            # --- NCCN Information Section ---
-            if nccn_data:
-                st.header("NCCN Information")
-                unique_genes = df['Gene'].unique()
-                nccn_tabs = st.tabs(unique_genes)
-                for i, gene in enumerate(unique_genes):
-                    with nccn_tabs[i]:
-                        info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
-                        st.markdown(info)
+            if df is None or df.empty:
+                st.error("Could not parse any variants from the molecular report.")
+                if debug_log:
+                    st.subheader("PDF Parsing Debug Log")
+                    st.text_area("Log", debug_log, height=300)
+            else:
+                st.success(f"Successfully parsed {len(df)} variants from the report.")
+                
+                # --- OncoKB Results Section ---
+                st.header("OncoKB Results")
+                with st.spinner("Querying OncoKB for all variants..."):
+                    for index, row in df.iterrows():
+                        gene = row['Gene']
+                        alt = row['Alteration']
+                        with st.expander(f"**{gene} p.{alt}**", expanded=(index == 0)):
+                            data = get_oncokb_data(gene, alt, tumor_type, api_token)
+                            display_oncokb_results(data, gene, alt)
+                
+                # --- NCCN Information Section ---
+                if nccn_data:
+                    st.header("NCCN Information")
+                    unique_genes = df['Gene'].unique()
+                    # **FIX:** Add a check to ensure unique_genes is not empty before creating tabs
+                    if len(unique_genes) > 0:
+                        nccn_tabs = st.tabs(list(unique_genes))
+                        for i, gene in enumerate(unique_genes):
+                            with nccn_tabs[i]:
+                                info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
+                                st.markdown(info)
+                    else:
+                        st.warning("No unique genes found in the report to display NCCN info.")
 
-            # --- AI Aggregator Section ---
-            st.header("AI Aggregator Links")
-            ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
-            ai_tabs = st.tabs(ai_tabs_list)
-            for i, row in df.iterrows():
-                with ai_tabs[i]:
-                    gene = row['Gene']
-                    alt = row['Alteration']
-                    query_text = f"what is the clinical significance of {gene} p.{alt}"
-                    perplexity_url = f"https://www.perplexity.ai/search?q={quote(query_text)}"
-                    st.info(f"**Generated Query:** `{query_text}`")
-                    st.link_button("Ask Perplexity.ai", perplexity_url)
+                # --- AI Aggregator Section ---
+                st.header("AI Aggregator Links")
+                # **FIX:** Add a check to ensure the dataframe is not empty
+                if not df.empty:
+                    ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
+                    ai_tabs = st.tabs(ai_tabs_list)
+                    for i, row in df.iterrows():
+                        with ai_tabs[i]:
+                            gene = row['Gene']
+                            alt = row['Alteration']
+                            query_text = f"what is the clinical significance of {gene} p.{alt}"
+                            perplexity_url = f"https://www.perplexity.ai/search?q={quote(query_text)}"
+                            st.info(f"**Generated Query:** `{query_text}`")
+                            st.link_button("Ask Perplexity.ai", perplexity_url)
+                else:
+                    st.warning("No variants found to generate AI aggregator links.")
 
 else:
     st.info("Upload your files and click 'Process Variants' in the sidebar to begin.")
