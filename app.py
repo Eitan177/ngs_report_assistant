@@ -31,7 +31,7 @@ import re
 from urllib.parse import quote
 import pdfplumber
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageEnhance
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -96,10 +96,10 @@ def parse_molecular_report(uploaded_file):
             debug_log = "--- PDF PARSING LOG ---\n"
             full_ocr_text = ""
             
-            # **IMPROVED REGEX:** This is a more robust, two-step approach.
-            # Step 1: Find a line with a gene and the word "variant". Capture the gene and the rest of the line.
-            line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense) variant\s+(.*)')
-            
+            # This regex is designed to be flexible for OCR'd text.
+            # It finds a gene, then looks for the first word-like string after "variant" as the alteration.
+            line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense)\s+variant\s+(?:Details\s+)?([^\s,]+)')
+
             with pdfplumber.open(file_bytes) as pdf:
                 debug_log += f"Successfully opened PDF. Found {len(pdf.pages)} pages.\n"
                 for i, page in enumerate(pdf.pages):
@@ -108,8 +108,15 @@ def parse_molecular_report(uploaded_file):
                     if not page_text or page_text.strip() == "":
                         debug_log += f"Page {i+1}: No text extracted. Attempting OCR...\n"
                         try:
-                            page_image = page.to_image(resolution=300).original
-                            ocr_text = pytesseract.image_to_string(page_image)
+                            # **IMPROVED OCR:** Pre-process the image for better accuracy.
+                            img = page.to_image(resolution=300).original
+                            # Convert to grayscale
+                            img = img.convert('L')
+                            # Increase contrast
+                            enhancer = ImageEnhance.Contrast(img)
+                            img = enhancer.enhance(2)
+                            
+                            ocr_text = pytesseract.image_to_string(img)
                             page_text = ocr_text
                             full_ocr_text += ocr_text + "\n\n"
                             debug_log += f"Page {i+1}: OCR extracted {len(page_text)} characters.\n"
@@ -123,12 +130,9 @@ def parse_molecular_report(uploaded_file):
                         match = line_finder_re.search(line)
                         if match:
                             gene = match.group(1)
-                            details_string = match.group(2)
+                            alteration = match.group(2)
                             
-                            # Step 2: From the "details" part, take the first "word" as the alteration.
-                            alteration = details_string.split(',')[0].strip()
-                            
-                            # Clean up common OCR artifacts from the alteration string
+                            # Clean up common OCR artifacts
                             if 'p.' in alteration.lower():
                                 alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
                             
