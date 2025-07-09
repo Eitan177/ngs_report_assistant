@@ -81,7 +81,6 @@ def parse_molecular_report(uploaded_file):
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
-        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -96,7 +95,10 @@ def parse_molecular_report(uploaded_file):
             variants = []
             debug_log = "--- PDF PARSING LOG ---\n"
             full_ocr_text = ""
-            gene_alteration_re = re.compile(r'\b([A-Z][A-Z0-9]{2,9})\b.*?p\.([A-Za-z0-9*fsdel>]+)')
+            
+            # **IMPROVED REGEX:** This is a more robust, two-step approach.
+            # Step 1: Find a line with a gene and the word "variant". Capture the gene and the rest of the line.
+            line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense) variant\s+(.*)')
             
             with pdfplumber.open(file_bytes) as pdf:
                 debug_log += f"Successfully opened PDF. Found {len(pdf.pages)} pages.\n"
@@ -108,8 +110,8 @@ def parse_molecular_report(uploaded_file):
                         try:
                             page_image = page.to_image(resolution=300).original
                             ocr_text = pytesseract.image_to_string(page_image)
-                            page_text = ocr_text # Use OCR text for parsing
-                            full_ocr_text += ocr_text + "\n\n" # Store for debugging
+                            page_text = ocr_text
+                            full_ocr_text += ocr_text + "\n\n"
                             debug_log += f"Page {i+1}: OCR extracted {len(page_text)} characters.\n"
                         except Exception as ocr_error:
                             debug_log += f"Page {i+1}: OCR failed. Tesseract may not be installed correctly. Error: {ocr_error}\n"
@@ -118,17 +120,24 @@ def parse_molecular_report(uploaded_file):
                         debug_log += f"Page {i+1}: Standard text extraction found {len(page_text)} characters.\n"
 
                     for line in page_text.split('\n'):
-                        match = gene_alteration_re.search(line)
+                        match = line_finder_re.search(line)
                         if match:
                             gene = match.group(1)
-                            alteration = match.group(2).split(',')[0].strip()
+                            details_string = match.group(2)
+                            
+                            # Step 2: From the "details" part, take the first "word" as the alteration.
+                            alteration = details_string.split(',')[0].strip()
+                            
+                            # Clean up common OCR artifacts from the alteration string
+                            if 'p.' in alteration.lower():
+                                alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
+                            
                             variants.append({'Gene': gene, 'Alteration': alteration})
 
             if variants:
                 df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
                 return (df, None)
             else:
-                # **ENHANCED DEBUGGING:** Add the full OCR text to the log if parsing fails.
                 debug_log += "\n--- FULL EXTRACTED TEXT ---\n" + (full_ocr_text or "No text was extracted from any page.")
                 return (pd.DataFrame(), debug_log)
 
@@ -268,3 +277,4 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
