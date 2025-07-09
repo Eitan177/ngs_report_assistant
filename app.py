@@ -57,7 +57,7 @@ def parse_nccn_file(uploaded_file):
     
     text = uploaded_file.getvalue().decode('utf-8')
     nccn_data = {}
-    # **FIX:** Split the file by the bullet point character, which is the actual separator.
+    # Split the file by the bullet point character, which is the actual separator.
     gene_blocks = text.split('•')
     
     for block in gene_blocks:
@@ -229,6 +229,12 @@ if st.sidebar.button("Process Variants", type="primary"):
         # Parse NCCN data
         nccn_data = parse_nccn_file(nccn_file)
         
+        # **DEBUGGING:** Display the parsed NCCN data to see what keys are being generated.
+        if nccn_data:
+            with st.expander("NCCN Parsing Debug"):
+                st.write("The following dictionary was created from your NCCN file:")
+                st.json(nccn_data)
+        
         # Check the return from the parser before unpacking to prevent TypeError
         parsing_result = parse_molecular_report(report_file)
         if parsing_result is None:
@@ -293,3 +299,4 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
