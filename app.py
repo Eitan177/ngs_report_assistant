@@ -95,6 +95,7 @@ def parse_molecular_report(uploaded_file):
         elif 'pdf' in filename:
             variants = []
             debug_log = "--- PDF PARSING LOG ---\n"
+            full_ocr_text = ""
             gene_alteration_re = re.compile(r'\b([A-Z][A-Z0-9]{2,9})\b.*?p\.([A-Za-z0-9*fsdel>]+)')
             
             with pdfplumber.open(file_bytes) as pdf:
@@ -106,7 +107,9 @@ def parse_molecular_report(uploaded_file):
                         debug_log += f"Page {i+1}: No text extracted. Attempting OCR...\n"
                         try:
                             page_image = page.to_image(resolution=300).original
-                            page_text = pytesseract.image_to_string(page_image)
+                            ocr_text = pytesseract.image_to_string(page_image)
+                            page_text = ocr_text # Use OCR text for parsing
+                            full_ocr_text += ocr_text + "\n\n" # Store for debugging
                             debug_log += f"Page {i+1}: OCR extracted {len(page_text)} characters.\n"
                         except Exception as ocr_error:
                             debug_log += f"Page {i+1}: OCR failed. Tesseract may not be installed correctly. Error: {ocr_error}\n"
@@ -125,6 +128,8 @@ def parse_molecular_report(uploaded_file):
                 df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
                 return (df, None)
             else:
+                # **ENHANCED DEBUGGING:** Add the full OCR text to the log if parsing fails.
+                debug_log += "\n--- FULL EXTRACTED TEXT ---\n" + (full_ocr_text or "No text was extracted from any page.")
                 return (pd.DataFrame(), debug_log)
 
     except Exception as e:
