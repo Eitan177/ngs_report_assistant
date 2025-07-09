@@ -51,29 +51,29 @@ def get_level_class(level):
 
 # --- Data Parsing Functions ---
 def parse_nccn_file(uploaded_file):
-    """Parses the uploaded NCCN text file into a dictionary with looser formatting rules."""
+    """Parses the uploaded NCCN text file into a dictionary based on bullet point separators."""
     if uploaded_file is None:
         return {}
     
     text = uploaded_file.getvalue().decode('utf-8')
     nccn_data = {}
-    # Split the file by '---' which separates different gene entries
-    gene_blocks = text.split('---')
-    
-    # Regex to find a likely gene name (e.g., all caps, 2-10 chars, word boundary)
-    gene_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b')
+    # **FIX:** Split the file by the bullet point character, which is the actual separator.
+    gene_blocks = text.split('•')
     
     for block in gene_blocks:
         block = block.strip()
         if not block:
             continue
         
-        # **IMPROVED LOGIC:** Find the first potential gene name anywhere in the block.
-        match = gene_finder_re.search(block)
-        if match:
-            gene_name = match.group(1)
-            # Add the entire block of text to the dictionary under that gene name
-            nccn_data[gene_name] = block
+        lines = block.split('\n')
+        # The first non-empty line should contain the gene name.
+        if lines and lines[0].strip():
+            # The gene name is the first word on that line.
+            gene_name = lines[0].strip().split()[0].upper()
+            # A simple check to ensure the gene name looks like a gene name
+            if gene_name and re.match(r'^[A-Z0-9]{2,10}$', gene_name):
+                # Add the entire block of text to the dictionary under that gene name
+                nccn_data[gene_name] = block
             
     return nccn_data
 
@@ -214,7 +214,7 @@ st.title("OncoKB Batch Variant Querier")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
-st.sidebar.info("Format your NCCN .txt file by separating each gene's entry with '---'. The app will automatically find the gene name within each block.")
+st.sidebar.info("Format your NCCN .txt file by separating each gene's entry with a bullet point '•'.")
 
 
 st.sidebar.header("2. Query Options")
@@ -293,5 +293,3 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
-
