@@ -51,7 +51,7 @@ def get_level_class(level):
 
 # --- Data Parsing Functions ---
 def parse_nccn_file(uploaded_file):
-    """Parses the uploaded NCCN text file into a dictionary."""
+    """Parses the uploaded NCCN text file into a dictionary with looser formatting rules."""
     if uploaded_file is None:
         return {}
     
@@ -60,20 +60,20 @@ def parse_nccn_file(uploaded_file):
     # Split the file by '---' which separates different gene entries
     gene_blocks = text.split('---')
     
+    # Regex to find a likely gene name (e.g., all caps, 2-10 chars, word boundary)
+    gene_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b')
+    
     for block in gene_blocks:
         block = block.strip()
         if not block:
             continue
         
-        lines = block.split('\n')
-        # **IMPROVED LOGIC:** Assume the first non-empty line is the gene name.
-        gene_name = lines[0].strip().upper()
-        # The info is the rest of the block
-        info = "\n".join(lines[1:]).strip()
-        
-        # A simple check to ensure the gene name looks like a gene name and is not empty
-        if gene_name and re.match(r'^[A-Z0-9]+$', gene_name):
-            nccn_data[gene_name] = info
+        # **IMPROVED LOGIC:** Find the first potential gene name anywhere in the block.
+        match = gene_finder_re.search(block)
+        if match:
+            gene_name = match.group(1)
+            # Add the entire block of text to the dictionary under that gene name
+            nccn_data[gene_name] = block
             
     return nccn_data
 
@@ -214,7 +214,7 @@ st.title("OncoKB Batch Variant Querier")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
-st.sidebar.info("Format your NCCN .txt file with the gene name on the first line, followed by the information. Separate each gene's entry with '---'.")
+st.sidebar.info("Format your NCCN .txt file by separating each gene's entry with '---'. The app will automatically find the gene name within each block.")
 
 
 st.sidebar.header("2. Query Options")
@@ -258,11 +258,12 @@ if st.sidebar.button("Process Variants", type="primary"):
                 if nccn_data:
                     st.header("NCCN Information")
                     unique_genes = df['Gene'].unique()
-                    # **FIX:** Add a check to ensure unique_genes is not empty before creating tabs
                     if len(unique_genes) > 0:
+                        # Convert numpy array to list for st.tabs
                         nccn_tabs = st.tabs(list(unique_genes))
                         for i, gene in enumerate(unique_genes):
                             with nccn_tabs[i]:
+                                # Find the corresponding info, case-insensitive
                                 info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
                                 st.markdown(info)
                     else:
@@ -270,18 +271,18 @@ if st.sidebar.button("Process Variants", type="primary"):
 
                 # --- AI Aggregator Section ---
                 st.header("AI Aggregator Links")
-                # **FIX:** Add a check to ensure the dataframe is not empty
                 if not df.empty:
                     ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
-                    ai_tabs = st.tabs(ai_tabs_list)
-                    for i, row in df.iterrows():
-                        with ai_tabs[i]:
-                            gene = row['Gene']
-                            alt = row['Alteration']
-                            query_text = f"what is the clinical significance of {gene} p.{alt}"
-                            perplexity_url = f"https://www.perplexity.ai/search?q={quote(query_text)}"
-                            st.info(f"**Generated Query:** `{query_text}`")
-                            st.link_button("Ask Perplexity.ai", perplexity_url)
+                    if ai_tabs_list:
+                        ai_tabs = st.tabs(ai_tabs_list)
+                        for i, row in df.iterrows():
+                            with ai_tabs[i]:
+                                gene = row['Gene']
+                                alt = row['Alteration']
+                                query_text = f"what is the clinical significance of {gene} p.{alt}"
+                                perplexity_url = f"https://www.perplexity.ai/search?q={quote(query_text)}"
+                                st.info(f"**Generated Query:** `{query_text}`")
+                                st.link_button("Ask Perplexity.ai", perplexity_url)
                 else:
                     st.warning("No variants found to generate AI aggregator links.")
 
