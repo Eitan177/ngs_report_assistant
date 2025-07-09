@@ -42,16 +42,11 @@ st.set_page_config(
 
 # --- Helper Functions ---
 def get_level_class(level):
-    """Returns a Bootstrap color class based on the OncoKB level."""
+    """Returns a color string for Streamlit based on the OncoKB level."""
     level_map = {
         'LEVEL_1': 'green', 'LEVEL_2': 'blue', 'LEVEL_3A': 'orange',
         'LEVEL_3B': 'orange', 'LEVEL_4': 'violet', 'LEVEL_R1': 'red', 'LEVEL_R2': 'red'
     }
-    return level_map.get(level, 'gray')
-
-def get_implication_level_class(level):
-    """Returns a Bootstrap color class for implication levels."""
-    level_map = {'LEVEL_1': 'green', 'LEVEL_2': 'blue', 'LEVEL_3': 'orange', 'LEVEL_4': 'violet'}
     return level_map.get(level, 'gray')
 
 # --- Data Parsing Functions ---
@@ -62,18 +57,26 @@ def parse_nccn_file(uploaded_file):
     
     text = uploaded_file.getvalue().decode('utf-8')
     nccn_data = {}
+    # Split the file by '---' which separates different gene entries
     gene_blocks = text.split('---')
-    gene_re = re.compile(r'GENE:\s*([A-Z0-9]+)', re.IGNORECASE)
     
     for block in gene_blocks:
-        if not block.strip():
+        block = block.strip()
+        if not block:
             continue
-        match = gene_re.search(block)
-        if match:
-            gene_name = match.group(1).upper()
-            nccn_data[gene_name] = block.strip()
+        
+        lines = block.split('\n')
+        # **IMPROVED LOGIC:** Assume the first non-empty line is the gene name.
+        gene_name = lines[0].strip().upper()
+        # The info is the rest of the block
+        info = "\n".join(lines[1:]).strip()
+        
+        # A simple check to ensure the gene name looks like a gene name and is not empty
+        if gene_name and re.match(r'^[A-Z0-9]+$', gene_name):
+            nccn_data[gene_name] = info
             
     return nccn_data
+
 
 def parse_molecular_report(uploaded_file):
     """
@@ -211,6 +214,8 @@ st.title("OncoKB Batch Variant Querier")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
+st.sidebar.info("Format your NCCN .txt file with the gene name on the first line, followed by the information. Separate each gene's entry with '---'.")
+
 
 st.sidebar.header("2. Query Options")
 api_token = st.sidebar.text_input("OncoKB API Token (Optional)", type="password")
@@ -287,4 +292,5 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
 
