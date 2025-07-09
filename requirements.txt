@@ -1,0 +1,7 @@
+requests
+pandas
+pdfplumber
+pytesseract
+Pillow
+streamlit
+streamlit-option-menu
