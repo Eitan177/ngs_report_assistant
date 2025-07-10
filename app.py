@@ -180,33 +180,38 @@ def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
 # --- UI Rendering Functions ---
 def display_oncokb_results(data, hugo_symbol, alteration):
     """Displays the formatted OncoKB results in an expander."""
+    
+    # First, display results if they are valid
     if 'error' in data:
         st.error(data['error'])
-        return
-    if data.get('query', {}).get('variant') == "UNKNOWN":
+    elif data.get('query', {}).get('variant') == "UNKNOWN":
         st.warning("Variant not found in OncoKB.")
-        return
+    else:
+        query = data.get('query', {})
+        oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{alteration}"
+        
+        st.markdown(f"**Tumor Type in Query:** `{query.get('tumorType', 'Not specified')}`")
+        st.link_button("View on OncoKB", oncokb_link)
+        
+        st.subheader("Summaries")
+        st.info(f"**Gene Summary:** {data.get('geneSummary', 'N/A')}")
+        st.info(f"**Variant Summary:** {data.get('variantSummary', 'N/A')}")
 
-    query = data.get('query', {})
-    oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{alteration}"
-    
-    st.markdown(f"**Tumor Type in Query:** `{query.get('tumorType', 'Not specified')}`")
-    st.link_button("View on OncoKB", oncokb_link)
-    
-    st.subheader("Summaries")
-    st.info(f"**Gene Summary:** {data.get('geneSummary', 'N/A')}")
-    st.info(f"**Variant Summary:** {data.get('variantSummary', 'N/A')}")
+        if data.get('treatments'):
+            st.subheader("Therapeutic Implications")
+            for treatment in data.get('treatments', []):
+                drugs = ", ".join([d['drugName'] for d in treatment['drugs']])
+                level = treatment['level'].replace('_', ' ')
+                indication = treatment.get('indication', {}).get('name', 'N/A')
+                pmids = ", ".join([f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})" for pmid in treatment.get('pmids', [])])
+                
+                st.markdown(f"**{drugs}** - `{indication}`")
+                st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
 
-    if data.get('treatments'):
-        st.subheader("Therapeutic Implications")
-        for treatment in data.get('treatments', []):
-            drugs = ", ".join([d['drugName'] for d in treatment['drugs']])
-            level = treatment['level'].replace('_', ' ')
-            indication = treatment.get('indication', {}).get('name', 'N/A')
-            pmids = ", ".join([f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})" for pmid in treatment.get('pmids', [])])
-            
-            st.markdown(f"**{drugs}** - `{indication}`")
-            st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
+    # **ADDED:** Always show the raw JSON response for debugging purposes.
+    st.divider()
+    with st.expander("Show Raw OncoKB Response"):
+        st.json(data)
 
 # --- Main App ---
 st.title("OncoKB Batch Variant Querier")
@@ -219,8 +224,6 @@ st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. 
 
 
 st.sidebar.header("2. Query Options")
-# **REMOVED:** The API token input is no longer needed in the UI.
-# api_token = st.sidebar.text_input("OncoKB API Token (Optional)", type="password")
 tumor_type = st.sidebar.text_input("Tumor Type (Applied to all variants)", placeholder="e.g., Melanoma")
 
 # --- Main Processing Logic ---
@@ -228,14 +231,9 @@ if st.sidebar.button("Process Variants", type="primary"):
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
-        # **ADDED:** Securely access the API key from Streamlit's secrets management.
-        # This will be None if not running on Streamlit Cloud or if the secret isn't set.
         api_token = st.secrets.get("ONCOKB_API_KEY")
-
-        # Parse NCCN data
         nccn_data = parse_nccn_file(nccn_file)
         
-        # Check the return from the parser before unpacking to prevent TypeError
         parsing_result = parse_molecular_report(report_file)
         if parsing_result is None:
             st.error("The file parser returned an unexpected error. Please check the console for more details.")
@@ -250,6 +248,11 @@ if st.sidebar.button("Process Variants", type="primary"):
             else:
                 st.success(f"Successfully parsed {len(df)} variants from the report.")
                 
+                if nccn_data:
+                    with st.expander("NCCN Parsing Debug"):
+                        st.write("The following dictionary was created from your NCCN file:")
+                        st.json(nccn_data)
+
                 # --- OncoKB Results Section ---
                 st.header("OncoKB Results")
                 with st.spinner("Querying OncoKB for all variants..."):
@@ -257,7 +260,6 @@ if st.sidebar.button("Process Variants", type="primary"):
                         gene = row['Gene']
                         alt = row['Alteration']
                         with st.expander(f"**{gene} p.{alt}**", expanded=(index == 0)):
-                            # Pass the retrieved api_token to the function
                             data = get_oncokb_data(gene, alt, tumor_type, api_token)
                             display_oncokb_results(data, gene, alt)
                 
@@ -266,11 +268,9 @@ if st.sidebar.button("Process Variants", type="primary"):
                     st.header("NCCN Information")
                     unique_genes = df['Gene'].unique()
                     if len(unique_genes) > 0:
-                        # Convert numpy array to list for st.tabs
                         nccn_tabs = st.tabs(list(unique_genes))
                         for i, gene in enumerate(unique_genes):
                             with nccn_tabs[i]:
-                                # Find the corresponding info, case-insensitive
                                 info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
                                 st.markdown(info)
                     else:
@@ -300,3 +300,4 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
