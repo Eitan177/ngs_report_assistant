@@ -51,14 +51,15 @@ def get_level_class(level):
 
 # --- Data Parsing Functions ---
 def parse_nccn_file(uploaded_file):
-    """Parses the uploaded NCCN text file into a dictionary based on bullet point separators."""
+    """Parses the uploaded NCCN text file formatted with Markdown headers."""
     if uploaded_file is None:
         return {}
     
     text = uploaded_file.getvalue().decode('utf-8')
     nccn_data = {}
-    # Split the file by the bullet point character, which is the actual separator.
-    gene_blocks = text.split('•')
+    
+    # **FIX:** Split the file by the Markdown H3 header '### '
+    gene_blocks = text.split('### ')
     
     for block in gene_blocks:
         block = block.strip()
@@ -66,14 +67,15 @@ def parse_nccn_file(uploaded_file):
             continue
         
         lines = block.split('\n')
-        # The first non-empty line should contain the gene name.
-        if lines and lines[0].strip():
-            # The gene name is the first word on that line.
-            gene_name = lines[0].strip().split()[0].upper()
-            # A simple check to ensure the gene name looks like a gene name
-            if gene_name and re.match(r'^[A-Z0-9]{2,10}$', gene_name):
-                # Add the entire block of text to the dictionary under that gene name
-                nccn_data[gene_name] = block
+        # The first line is the header containing the gene name.
+        header_line = lines[0].strip()
+        # The gene is the first word in the header.
+        gene_name = header_line.split()[0].upper()
+        
+        # A simple check to ensure the gene name looks like a gene name
+        if gene_name and re.match(r'^[A-Z0-9]+$', gene_name):
+            # Add the entire block of text to the dictionary under that gene name
+            nccn_data[gene_name] = block
             
     return nccn_data
 
@@ -214,7 +216,7 @@ st.title("OncoKB Batch Variant Querier")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
-st.sidebar.info("Format your NCCN .txt file by separating each gene's entry with a bullet point '•'.")
+st.sidebar.info("Format your NCCN .txt file with each gene entry starting with '### GENE_NAME'.")
 
 
 st.sidebar.header("2. Query Options")
@@ -228,12 +230,6 @@ if st.sidebar.button("Process Variants", type="primary"):
     else:
         # Parse NCCN data
         nccn_data = parse_nccn_file(nccn_file)
-        
-        # **DEBUGGING:** Display the parsed NCCN data to see what keys are being generated.
-        if nccn_data:
-            with st.expander("NCCN Parsing Debug"):
-                st.write("The following dictionary was created from your NCCN file:")
-                st.json(nccn_data)
         
         # Check the return from the parser before unpacking to prevent TypeError
         parsing_result = parse_molecular_report(report_file)
@@ -271,7 +267,7 @@ if st.sidebar.button("Process Variants", type="primary"):
                             with nccn_tabs[i]:
                                 # Find the corresponding info, case-insensitive
                                 info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
-                                st.markdown(info)
+                                st.markdown(info, unsafe_allow_html=True)
                     else:
                         st.warning("No unique genes found in the report to display NCCN info.")
 
