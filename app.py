@@ -56,11 +56,9 @@ def parse_nccn_file(uploaded_file):
     if uploaded_file is None:
         return {}
     
-    # Use utf-8-sig to handle potential Byte Order Mark (BOM) at the start of the file
     text = uploaded_file.getvalue().decode('utf-8-sig')
     nccn_data = {}
     
-    # This regex splits the file into blocks before each line that looks like a gene header.
     gene_blocks = re.split(r'\n(?=\s*[A-Z0-9]{2,10}\s*\n)', text)
     
     for block in gene_blocks:
@@ -85,7 +83,6 @@ def parse_molecular_report(uploaded_file):
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
-        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -181,7 +178,6 @@ def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
 def display_oncokb_results(data, hugo_symbol, alteration):
     """Displays the formatted OncoKB results in an expander."""
     
-    # First, display results if they are valid
     if 'error' in data:
         st.error(data['error'])
     elif data.get('query', {}).get('variant') == "UNKNOWN":
@@ -208,7 +204,6 @@ def display_oncokb_results(data, hugo_symbol, alteration):
                 st.markdown(f"**{drugs}** - `{indication}`")
                 st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
 
-    # **ADDED:** Always show the raw JSON response for debugging purposes.
     st.divider()
     with st.expander("Show Raw OncoKB Response"):
         st.json(data)
@@ -226,17 +221,25 @@ st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. 
 st.sidebar.header("2. Query Options")
 tumor_type = st.sidebar.text_input("Tumor Type (Applied to all variants)", placeholder="e.g., Melanoma")
 
+# **ADDED:** API Key status indicator for debugging.
+st.sidebar.divider()
+api_token = st.secrets.get("ONCOKB_API_KEY")
+if api_token:
+    st.sidebar.success("OncoKB API key found.")
+else:
+    st.sidebar.warning("OncoKB API key not found. Using public API.")
+st.sidebar.divider()
+
 # --- Main Processing Logic ---
 if st.sidebar.button("Process Variants", type="primary"):
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
-        api_token = st.secrets.get("ONCOKB_API_KEY")
         nccn_data = parse_nccn_file(nccn_file)
         
         parsing_result = parse_molecular_report(report_file)
         if parsing_result is None:
-            st.error("The file parser returned an unexpected error. Please check the console for more details.")
+            st.error("The file parser returned an unexpected error.")
         else:
             df, debug_log = parsing_result
             
@@ -248,11 +251,6 @@ if st.sidebar.button("Process Variants", type="primary"):
             else:
                 st.success(f"Successfully parsed {len(df)} variants from the report.")
                 
-                if nccn_data:
-                    with st.expander("NCCN Parsing Debug"):
-                        st.write("The following dictionary was created from your NCCN file:")
-                        st.json(nccn_data)
-
                 # --- OncoKB Results Section ---
                 st.header("OncoKB Results")
                 with st.spinner("Querying OncoKB for all variants..."):
@@ -300,4 +298,3 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
