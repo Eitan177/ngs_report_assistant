@@ -82,10 +82,9 @@ def parse_nccn_text(text):
 def parse_molecular_report(uploaded_file):
     """
     Parses the uploaded molecular report file.
-    Returns a tuple: (DataFrame, debug_log).
+    For CSV/XLS, it returns the raw DataFrame. For PDF, it returns a processed DataFrame.
     """
     if uploaded_file is None:
-        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -288,10 +287,31 @@ if 'results_df' not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
 if 'narrative_summary' not in st.session_state:
     st.session_state.narrative_summary = ""
+if 'column_selection_needed' not in st.session_state:
+    st.session_state.column_selection_needed = False
+if 'raw_df' not in st.session_state:
+    st.session_state.raw_df = None
+
+
+def process_dataframe(df):
+    """The main logic for processing a finalized DataFrame."""
+    st.session_state.results_df = df
+    st.session_state.column_selection_needed = False
+    
+    st.success(f"Successfully parsed {len(df)} variants from the report.")
+    all_oncokb_data = []
+    for index, row in df.iterrows():
+        data = get_oncokb_data(row['Gene'], row['Alteration'], st.session_state.tumor_type, oncokb_api_token)
+        all_oncokb_data.append(data)
+    st.session_state.all_oncokb_data = all_oncokb_data
+
 
 # --- Main Processing Logic ---
 if st.sidebar.button("Process Variants", type="primary"):
-    st.session_state.narrative_summary = "" # Clear previous summary
+    st.session_state.narrative_summary = ""
+    st.session_state.results_df = pd.DataFrame()
+    st.session_state.column_selection_needed = False
+    
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
@@ -308,29 +328,48 @@ if st.sidebar.button("Process Variants", type="primary"):
             nccn_text = nccn_file_upload.getvalue().decode('utf-8-sig')
             st.sidebar.info("Loaded NCCN data from uploaded file.")
         
-        nccn_data = parse_nccn_text(nccn_text)
+        st.session_state.nccn_data = parse_nccn_text(nccn_text)
+        st.session_state.tumor_type = tumor_type
         
         parsing_result = parse_molecular_report(report_file)
         if parsing_result is None:
             st.error("The file parser returned an unexpected error.")
         else:
             df, debug_log = parsing_result
-            st.session_state.results_df = df
-            st.session_state.nccn_data = nccn_data
-            st.session_state.tumor_type = tumor_type
             
             if df is None or df.empty:
                 st.error("Could not parse any variants from the molecular report.")
                 if debug_log:
-                    st.subheader("PDF Parsing Debug Log")
+                    st.subheader("PDF/File Parsing Debug Log")
                     st.text_area("Log", debug_log, height=300)
+            # This handles CSV/XLS files that need column mapping
+            elif 'Gene' not in df.columns or 'Alteration' not in df.columns:
+                st.session_state.raw_df = df
+                st.session_state.column_selection_needed = True
             else:
-                st.success(f"Successfully parsed {len(df)} variants from the report.")
-                all_oncokb_data = []
-                for index, row in df.iterrows():
-                    data = get_oncokb_data(row['Gene'], row['Alteration'], tumor_type, oncokb_api_token)
-                    all_oncokb_data.append(data)
-                st.session_state.all_oncokb_data = all_oncokb_data
+                process_dataframe(df)
+
+# --- Interactive Column Selection UI ---
+if st.session_state.column_selection_needed:
+    st.warning("Could not automatically identify 'Gene' and 'Alteration' columns.")
+    st.info("Please select the correct columns from your file below:")
+    
+    df_columns = list(st.session_state.raw_df.columns)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        gene_col = st.selectbox("Select the column containing the **Gene**", df_columns, index=None)
+    with col2:
+        alteration_col = st.selectbox("Select the column containing the **Alteration**", df_columns, index=None)
+        
+    if st.button("Confirm Columns"):
+        if gene_col and alteration_col:
+            temp_df = st.session_state.raw_df.rename(columns={gene_col: 'Gene', alteration_col: 'Alteration'})
+            process_dataframe(temp_df[['Gene', 'Alteration']])
+            st.rerun()
+        else:
+            st.error("Please select both a Gene and an Alteration column.")
+
 
 # --- Sidebar Actions (Post-Processing) ---
 if not st.session_state.results_df.empty:
@@ -347,19 +386,17 @@ if not st.session_state.results_df.empty:
 
 
 # --- Display Results ---
-if not st.session_state.results_df.empty:
+if not st.session_state.results_df.empty and not st.session_state.column_selection_needed:
     df = st.session_state.results_df
     nccn_data = st.session_state.nccn_data
     tumor_type = st.session_state.tumor_type
     all_oncokb_data = st.session_state.all_oncokb_data
 
-    # **CHANGED:** Display Gemini Summary at the top if it exists
     if st.session_state.narrative_summary:
         st.header("Narrative Summary (Gemini)")
         st.markdown(st.session_state.narrative_summary)
         st.divider()
 
-    # --- OncoKB Results Section ---
     st.header("OncoKB Results")
     oncokb_tabs_list = [f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
@@ -368,7 +405,6 @@ if not st.session_state.results_df.empty:
             with oncokb_tabs[i]:
                 display_oncokb_results(all_oncokb_data[i], row['Gene'], row['Alteration'])
     
-    # --- NCCN Information Section ---
     if nccn_data:
         st.header("NCCN Information")
         unique_genes = df['Gene'].unique()
@@ -383,7 +419,6 @@ if not st.session_state.results_df.empty:
         else:
             st.warning("No unique genes found in the report to display NCCN info.")
 
-    # --- AI Aggregator Section ---
     st.header("AI Aggregator Links")
     if not df.empty:
         ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
@@ -403,10 +438,11 @@ if not st.session_state.results_df.empty:
     else:
         st.warning("No variants found to generate AI aggregator links.")
 
-else:
+elif not st.session_state.column_selection_needed:
     st.info("Upload your files and click 'Process Variants' in the sidebar to begin.")
 
 # Sample data for initial view if no file is uploaded
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
