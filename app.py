@@ -184,19 +184,15 @@ def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_ap
     prompt_context += f"**Patient Context:** The patient has a tumor of type: {tumor_type or 'Not Specified'}.\n\n"
     prompt_context += "**Source Data:**\n"
     
-    # Add OncoKB data to the prompt
     prompt_context += "--- OncoKB Information ---\n"
     for variant_data in all_oncokb_data:
-        # Only include successful queries in the prompt
         if 'query' in variant_data and variant_data.get('geneExist', False):
             prompt_context += json.dumps(variant_data, indent=2) + "\n\n"
             
-    # Add NCCN data to the prompt
     prompt_context += "\n--- NCCN Guideline Information ---\n"
     for gene, info in nccn_data.items():
         prompt_context += f"**Gene: {gene}**\n{info}\n\n"
         
-    # Define the task for the model
     prompt_task = (
         "**Task:** Based *only* on the source data provided above, generate a concise narrative summary "
         "suitable for a clinical report. Structure the summary as follows:\n"
@@ -262,7 +258,6 @@ st.title("NGS Report Assistant")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 
-# **CHANGED:** Set the default value for the GitHub URL input
 nccn_github_url = st.sidebar.text_input(
     "NCCN File GitHub URL", 
     value="https://raw.githubusercontent.com/Eitan177/ngs_report_assistant/refs/heads/main/nccn_cleaned.txt"
@@ -340,37 +335,59 @@ if not st.session_state.results_df.empty:
     tumor_type = st.session_state.tumor_type
     all_oncokb_data = st.session_state.all_oncokb_data
 
-    # --- OncoKB Results Section ---
-    st.header("OncoKB Results")
-    oncokb_tabs_list = [f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()]
-    if oncokb_tabs_list:
-        oncokb_tabs = st.tabs(oncokb_tabs_list)
-        for i, row in df.iterrows():
-            with oncokb_tabs[i]:
-                display_oncokb_results(all_oncokb_data[i], row['Gene'], row['Alteration'])
-    
-    # --- NCCN Information Section ---
-    if nccn_data:
-        st.header("NCCN Information")
-        unique_genes = df['Gene'].unique()
-        if len(unique_genes) > 0:
-            nccn_tabs = st.tabs(list(unique_genes))
-            for i, gene in enumerate(unique_genes):
-                with nccn_tabs[i]:
-                    if tumor_type:
-                        st.info(f"Showing general NCCN information for **{gene}**. Please review for information relevant to **{tumor_type}**.")
-                    info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
-                    st.markdown(info)
-        else:
-            st.warning("No unique genes found in the report to display NCCN info.")
+    # **CHANGED:** Create a two-column layout
+    col1, col2 = st.columns([2, 1]) # Main column is twice as wide as the AI column
 
-    # --- AI Aggregator Section ---
-    st.header("AI Aggregator Links")
-    ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
-    if ai_tabs_list:
-        ai_tabs = st.tabs(ai_tabs_list)
-        for i, row in df.iterrows():
-            with ai_tabs[i]:
+    with col1:
+        # --- OncoKB Results Section ---
+        st.header("OncoKB Results")
+        oncokb_tabs_list = [f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()]
+        if oncokb_tabs_list:
+            oncokb_tabs = st.tabs(oncokb_tabs_list)
+            for i, row in df.iterrows():
+                with oncokb_tabs[i]:
+                    display_oncokb_results(all_oncokb_data[i], row['Gene'], row['Alteration'])
+        
+        # --- NCCN Information Section ---
+        if nccn_data:
+            st.header("NCCN Information")
+            unique_genes = df['Gene'].unique()
+            if len(unique_genes) > 0:
+                nccn_tabs = st.tabs(list(unique_genes))
+                for i, gene in enumerate(unique_genes):
+                    with nccn_tabs[i]:
+                        if tumor_type:
+                            st.info(f"Showing general NCCN information for **{gene}**. Please review for information relevant to **{tumor_type}**.")
+                        info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
+                        st.markdown(info)
+            else:
+                st.warning("No unique genes found in the report to display NCCN info.")
+
+    with col2:
+        st.header("AI-Generated Summaries")
+        
+        # --- Narrative Summary Section ---
+        st.subheader("Narrative Summary (Gemini)")
+        if st.button("Generate Summary", disabled=(not gemini_api_key), key="gemini_summary"):
+            with st.spinner("Generating AI-powered summary..."):
+                summary = generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_api_key)
+                st.markdown(summary)
+        
+        st.divider()
+
+        # --- Perplexity Summary Link Section ---
+        st.subheader("Web-Sourced Summary (Perplexity)")
+        variant_list_str = ", ".join([f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()])
+        perplexity_summary_query = f"Provide a comprehensive clinical summary for the following variants found in a patient with {tumor_type or 'a tumor'}: {variant_list_str}"
+        perplexity_summary_url = f"https://www.perplexity.ai/search?q={quote(perplexity_summary_query)}"
+        st.info(f"**Generated Query:** `{perplexity_summary_query}`")
+        st.link_button("Ask Perplexity.ai", perplexity_summary_url)
+
+        st.divider()
+        # --- AI Aggregator Links Section ---
+        st.subheader("Perplexity Links (Individual Variants)")
+        with st.expander("Show Individual Variant Links"):
+            for i, row in df.iterrows():
                 gene = row['Gene']
                 alt = row['Alteration']
                 query_text = f"what is the clinical significance of {gene} p.{alt}"
@@ -378,15 +395,8 @@ if not st.session_state.results_df.empty:
                     query_text += f" in {tumor_type}"
                 
                 perplexity_url = f"https://www.perplexity.ai/search?q={quote(query_text)}"
-                st.info(f"**Generated Query:** `{query_text}`")
-                st.link_button("Ask Perplexity.ai", perplexity_url)
-    
-    # --- Narrative Summary Section ---
-    st.header("Narrative Summary")
-    if st.button("Generate Summary", disabled=(not gemini_api_key)):
-        with st.spinner("Generating AI-powered summary..."):
-            summary = generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_api_key)
-            st.markdown(summary)
+                st.markdown(f"[{gene} p.{alt}]({perplexity_url})")
+
 
 else:
     st.info("Upload your files and click 'Process Variants' in the sidebar to begin.")
