@@ -283,11 +283,15 @@ else:
     st.sidebar.warning("Gemini API key not found. Summary generation will be disabled.")
 st.sidebar.divider()
 
-# --- Main Processing Logic ---
+# --- Initialize Session State ---
 if 'results_df' not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
+if 'narrative_summary' not in st.session_state:
+    st.session_state.narrative_summary = ""
 
+# --- Main Processing Logic ---
 if st.sidebar.button("Process Variants", type="primary"):
+    st.session_state.narrative_summary = "" # Clear previous summary
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
@@ -328,15 +332,29 @@ if st.sidebar.button("Process Variants", type="primary"):
                     all_oncokb_data.append(data)
                 st.session_state.all_oncokb_data = all_oncokb_data
 
+# --- Sidebar Actions (Post-Processing) ---
+if not st.session_state.results_df.empty:
+    st.sidebar.header("3. Generate Summaries")
+    if st.sidebar.button("Generate Narrative Summary", disabled=(not gemini_api_key), key="gemini_summary"):
+        with st.spinner("Generating AI-powered summary..."):
+            summary = generate_narrative_summary(
+                st.session_state.all_oncokb_data, 
+                st.session_state.nccn_data, 
+                st.session_state.tumor_type, 
+                gemini_api_key
+            )
+            st.session_state.narrative_summary = summary
 
+
+# --- Display Results ---
 if not st.session_state.results_df.empty:
     df = st.session_state.results_df
     nccn_data = st.session_state.nccn_data
     tumor_type = st.session_state.tumor_type
     all_oncokb_data = st.session_state.all_oncokb_data
 
-    # **CHANGED:** Create a two-column layout
-    col1, col2 = st.columns([2, 1]) # Main column is twice as wide as the AI column
+    # Create a two-column layout
+    col1, col2 = st.columns([2, 1]) 
 
     with col1:
         # --- OncoKB Results Section ---
@@ -366,25 +384,13 @@ if not st.session_state.results_df.empty:
     with col2:
         st.header("AI-Generated Summaries")
         
-        # --- Narrative Summary Section ---
-        st.subheader("Narrative Summary (Gemini)")
-        if st.button("Generate Summary", disabled=(not gemini_api_key), key="gemini_summary"):
-            with st.spinner("Generating AI-powered summary..."):
-                summary = generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_api_key)
-                st.markdown(summary)
-        
-        st.divider()
+        # --- Narrative Summary Display ---
+        if st.session_state.narrative_summary:
+            st.subheader("Narrative Summary (Gemini)")
+            st.markdown(st.session_state.narrative_summary)
+            st.divider()
 
-        # --- Perplexity Summary Link Section ---
-        st.subheader("Web-Sourced Summary (Perplexity)")
-        variant_list_str = ", ".join([f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()])
-        perplexity_summary_query = f"Provide a comprehensive clinical summary for the following variants found in a patient with {tumor_type or 'a tumor'}: {variant_list_str}"
-        perplexity_summary_url = f"https://www.perplexity.ai/search?q={quote(perplexity_summary_query)}"
-        st.info(f"**Generated Query:** `{perplexity_summary_query}`")
-        st.link_button("Ask Perplexity.ai", perplexity_summary_url)
-
-        st.divider()
-        # --- AI Aggregator Links Section ---
+        # --- Perplexity Links Section ---
         st.subheader("Perplexity Links (Individual Variants)")
         with st.expander("Show Individual Variant Links"):
             for i, row in df.iterrows():
