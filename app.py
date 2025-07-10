@@ -86,6 +86,7 @@ def parse_molecular_report(uploaded_file):
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
+        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -208,7 +209,8 @@ def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_ap
     
     full_prompt = prompt_context + prompt_task
     
-    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={gemini_api_key}"
+    # **FIX:** Changed model from 'gemini-pro' to 'gemini-1.5-flash'
+    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
     headers = {'Content-Type': 'application/json'}
     payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
     
