@@ -1,0 +1,1382 @@
+1p loss of heterozygosity (LOH)
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: An unfavorable biomarker for Wilms tumor. Patients with combined LOH at 1p and 16q may not be suitable for therapy de-intensification.
+
+Detection Method(s): Cytogenetic and molecular testing for LOH of 1p is recommended for all newly diagnosed Wilms tumors.
+
+Therapeutic Implications: The prognostic significance implies treatment considerations, though specific therapies are not explicitly stated.
+
+1q gain/amplification
+Associated Cancer Type(s): Multiple Myeloma (MM), Wilms tumor.
+
+Significance/Prognosis:
+
+For MM: Part of the FISH panel for prognostic estimation of plasma cells. Defined as 3 copies of 1q21.
+
+For Wilms tumor: An unfavorable biomarker. Can be used to identify patients who are not appropriate for de-intensification of therapy.
+
+Detection Method(s): FISH. Cytogenetic and molecular testing for 1q gain is recommended for all newly diagnosed Wilms tumors.
+
+Therapeutic Implications: For Wilms tumor, 1q gain can be used to identify patients who are not appropriate for de-intensification of therapy.
+
+11p15 LOH/LOI (Loss of Heterozygosity/Loss of Imprinting)
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: Fewer data support its use as an unfavorable biomarker. A retrospective analysis suggested patients with favorable histology Wilms tumor (FHWT) and 11p15 LOH or LOI may not be suitable for reduction of therapy (observation without adjuvant chemotherapy).
+
+Syndrome Association: Familial Wiedemann-Beckwith syndrome and a second Wilms tumor locus both map to 11p15.5.
+
+Therapeutic Implications: May indicate that reduction of therapy is not suitable for patients with FHWT.
+
+11q aberrations
+Associated Cancer Type(s): Diffuse Large B-Cell Lymphoma (DLBCL), High-Grade B-Cell Lymphoma (HGBL), Burkitt Lymphoma (BL).
+
+Significance/Prognosis: Large B-Cell Lymphoma (LBCL) with 11q aberration is a provisional entity, previously known as Burkitt-like lymphoma with 11q aberration. This disease is characterized by deregulation of the 11q gene but lacks MYC rearrangements.
+
+Detection Method(s): Chromosomal microarray. Genetic testing includes 11q aberrations. FISH for MYC rearrangements is negative.
+
+Therapeutic Implications: Often treated like Burkitt Lymphoma, though optimal management is undefined.
+
+16q loss of heterozygosity (LOH)
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: An unfavorable biomarker for Wilms tumor. Patients with combined LOH at 1p and 16q may not be suitable for therapy de-intensification.
+
+Detection Method(s): Cytogenetic and molecular testing for LOH of 16q is recommended for all newly diagnosed Wilms tumors.
+
+Therapeutic Implications: The prognostic significance implies treatment considerations.
+
+ABL1 (gene rearrangement / fusion)
+Associated Cancer Type(s): Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE), Chronic Myeloid Leukemia (CML) (as BCR::ABL1 fusion).
+
+Significance/Prognosis:
+
+One of the tyrosine kinase (TK) gene fusions associated with MLNE. ETV6::ABL1 gene fusion can be missed with routine cytogenetics.
+
+For CML, BCR::ABL1 is the defining characteristic and is quantitatively monitored to assess disease burden.
+
+Detection Method(s):
+
+For ABL1 rearrangements: FISH, RT-PCR, RNA sequencing, NGS.
+
+For CML (BCR::ABL1): Quantitative RT-PCR (qPCR) is essential. FISH and mutational analysis are also used.
+
+Therapeutic Implications:
+
+For MLNE with ABL1 rearrangement: Dasatinib, Nilotinib, Asciminib, Bosutinib, Imatinib, Ponatinib.
+
+For CML (BCR::ABL1): Imatinib is standard therapy. Asciminib is an option for T315I mutation or resistance to prior TKIs.
+
+AKT1
+Associated Cancer Type(s): Breast Cancer.
+
+Significance/Prognosis: Mutations/alterations may be found in breast cancer.
+
+Therapeutic Implications: A target for PI3K inhibitors.
+
+ALK (Anaplastic Lymphoma Kinase)
+Associated Cancer Type(s): ALK-positive Large B-Cell Lymphoma (LBCL), Histiocytic Neoplasms (LCH, ECD, RDD), Primary Cutaneous CD30+ T-Cell Lymphoproliferative Disorders (PCTLD), Anaplastic Large-Cell Lymphoma (ALCL), Non-Small Cell Lung Cancer (NSCLC), Sarcoma, Neuroblastoma, Thyroid Carcinoma.
+
+Significance/Prognosis:
+
+ALK alterations are important for neuroblastoma management and prognosis.
+
+STRN-ALK fusion is a potential therapeutic target in aggressive thyroid cancers.
+
+Detection Method(s): FISH, IHC, NGS.
+
+Therapeutic Implications:
+
+Histiocytic Neoplasms: Crizotinib, Alectinib, Brigatinib, Ceritinib, Lorlatinib.
+
+NSCLC: Alectinib, brigatinib, ceritinib, crizotinib, or lorlatinib. ALK rearrangements are associated with less benefit from PD-1/PD-L1 inhibitors.
+
+Sarcoma: Crizotinib for ALK fusions.
+
+Neuroblastoma: ALK inhibitors are being investigated in clinical trials.
+
+Anaplastic Thyroid Carcinoma: Molecular testing should include ALK.
+
+APC
+Associated Cancer Type(s): Familial Adenomatous Polyposis (FAP).
+
+Significance/Prognosis: APC mutation analysis can contribute to therapeutic decisions in FAP. Desmoid risk in FAP patients is linked to early colectomy.
+
+Detection Method(s): APC mutation analysis.
+
+Therapeutic Implications: Guides therapeutic decisions in FAP.
+
+AR (Androgen Receptor)
+Associated Cancer Type(s): Salivary gland tumors, Prostate Carcinoma.
+
+Significance/Prognosis: Gene expression analysis can identify mechanisms of therapy resistance in prostate carcinoma.
+
+Detection Method(s): NGS profiling and other appropriate biomarker testing should check the status of at least the AR in salivary gland tumors.
+
+Therapeutic Implications: For AR-positive salivary gland tumors, Abiraterone + prednisone + LHRH agonist is a recommended therapy regimen.
+
+ARAF
+Associated Cancer Type(s): Histiocytic Neoplasms (LCH, ECD, RDD).
+
+Significance/Prognosis: A common mutation in the MAPK pathway in LCH and ECD.
+
+Detection Method(s): Targeted-capture, Next-Generation Sequencing (NGS).
+
+Therapeutic Implications: As part of the MAPK pathway, MEK inhibitors are relevant.
+
+ASXL1
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), Blastic Plasmacytoid Dendritic Cell Neoplasm (BPDCN), Myelodysplastic Syndromes (MDS), Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE), Myeloproliferative Neoplasms (MPN), specifically Myelofibrosis (MF), Chronic Myeloid Leukemia (CML), Chronic Myelomonocytic Leukemia (CMML).
+
+Significance/Prognosis:
+
+Has prognostic significance in AML and is part of the definition for AML-myelodysplasia-related (AML-MR).
+
+One of the most frequently mutated genes in clonal hematopoiesis of indeterminate potential (CHIP).
+
+Adverse mutation in primary myelofibrosis.
+
+Detection Method(s): Multiplex gene panels and targeted NGS analysis.
+
+Therapeutic Implications: No specific therapies are mentioned for ASXL1 mutations.
+
+ATM
+Associated Cancer Type(s): Chronic Lymphocytic Leukemia (CLL), Mantle Cell Lymphoma (MCL), Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma (CLL/SLL), Ovarian Cancer, Prostate Cancer.
+
+Significance/Prognosis:
+
+In CLL/SLL, del(11q) affects ATM and is informative for prognosis.
+
+Germline mutations are associated with a risk for lethal prostate cancer and gastric cancer.
+
+Detection Method(s): Genetic testing for homologous recombination genes.
+
+Therapeutic Implications: Mutations in ATM inform the use of PARP inhibitors in ovarian and prostate cancer. Somatic testing is recommended in metastatic prostate cancer.
+
+Genetic Counseling: Recommended due to association with inherited genetic syndromes.
+
+ATR
+Associated Cancer Type(s): Ovarian Cancer, Prostate Cancer.
+
+Significance/Prognosis: A DNA repair gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitor therapy in ovarian cancer.
+
+BAP1
+Associated Cancer Type(s): Mesothelioma (Pleural & Peritoneal), Uveal Melanoma, Kidney Cancer.
+
+Significance/Prognosis:
+
+Mesothelioma: Loss of BAP1 by IHC is associated with prolonged survival and helps differentiate from benign proliferations.
+
+Uveal Melanoma: A high-risk gene for distant metastasis. Associated with BAP1 Tumor Predisposition Syndrome.
+
+Detection Method(s): IHC for BAP1 expression.
+
+Therapeutic Implications: Prognostic significance guides management and surveillance strategies.
+
+BARD1
+Associated Cancer Type(s): Prostate Cancer, Neuroblastoma.
+
+Significance/Prognosis: Germline variants in neuroblastoma predict worse survival.
+
+Therapeutic Implications: For Prostate Cancer, mutations inform the use of PARP inhibitors (e.g., olaparib).
+
+BCOR
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), Myelodysplastic Syndromes (MDS), Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE), Pediatric undifferentiated sarcomas.
+
+Significance/Prognosis:
+
+Part of the definition for AML-myelodysplasia-related (AML-MR).
+
+A main effect gene in the IPSS-M for MDS.
+
+Therapeutic Implications: BCOR::CCNB3 fusion-positive tumors can be treated like Ewing sarcoma.
+
+BCORL1
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A residual gene in the Molecular International Prognosis Scoring System (IPSS-M) for MDS.
+
+BCL2
+Associated Cancer Type(s): Follicular Lymphoma (FL), Diffuse Large B-Cell Lymphoma (DLBCL), High-Grade B-Cell Lymphoma (HGBL), HIV-related B-Cell Lymphomas, Post-Transplant Lymphoproliferative Disorders (PTLD), Primary Cutaneous B-Cell Lymphomas (PCBCL).
+
+Significance/Prognosis: BCL2 rearrangements are key markers in lymphomas. HGBL with MYC and BCL2 rearrangements ("double-hit") is a recognized high-risk entity.
+
+Detection Method(s): FISH, IHC.
+
+Therapeutic Implications: Presence influences prognosis and treatment strategies, especially in "double-hit" lymphomas.
+
+BCL6
+Associated Cancer Type(s): Follicular Lymphoma (FL), Diffuse Large B-Cell Lymphoma (DLBCL), High-Grade B-Cell Lymphoma (HGBL), HIV-related B-Cell Lymphomas, Post-Transplant Lymphoproliferative Disorders (PTLD), Primary Cutaneous B-Cell Lymphomas (PCBCL).
+
+Significance/Prognosis: BCL6 rearrangements are key markers in lymphomas. HGBL with MYC and BCL6 rearrangements is a recognized high-risk entity.
+
+Detection Method(s): Karyotype or FISH, IHC.
+
+Therapeutic Implications: No specific therapies are mentioned directly for BCL6 rearrangements.
+
+BIRC3
+Associated Cancer Type(s): Mantle Cell Lymphoma (MCL), Chronic Lymphocytic Leukemia (CLL), Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma (CLL/SLL).
+
+Significance/Prognosis: Mutations support the diagnosis of MCL and have clinical significance in CLL/SLL.
+
+BRAF
+Associated Cancer Type(s): Histiocytic Neoplasms (LCH, ECD, RDD), Marginal Zone Lymphomas (MZL), Hairy Cell Leukemia (HCL), Cutaneous Melanoma, Esophageal/Gastric Cancers, Pancreatic Cancer, GIST, Thyroid Carcinoma, and many others.
+
+Significance/Prognosis: BRAF V600E is a common and important mutation across many cancers, often with prognostic significance (e.g., worse prognosis in thyroid cancer).
+
+Detection Method(s): BRAF V600E IHC (VE1), allele-specific PCR, NGS, FISH for fusions.
+
+Therapeutic Implications:
+
+Histiocytic Neoplasms (V600E): Vemurafenib, Cobimetinib, Dabrafenib, Trametinib.
+
+Melanoma (V600E): Dabrafenib/trametinib.
+
+Esophageal/EGJ Cancers (V600E): Dabrafenib and trametinib.
+
+Pancreatic Cancer (V600E): Dabrafenib + trametinib.
+
+GIST (V600E): Dabrafenib and trametinib.
+
+Thyroid Carcinoma (V600E): Dabrafenib/trametinib in anaplastic thyroid carcinoma.
+
+BRCA1
+Associated Cancer Type(s): Prostate Cancer, Ovarian Cancer, Pancreatic Cancer, Breast Cancer, Osteosarcoma.
+
+Significance/Prognosis: A key gene in homologous recombination repair deficiency (HRD). Germline mutations are associated with familial cancer syndromes like Li-Fraumeni.
+
+Detection Method(s): Genetic testing, NGS (preferred).
+
+Therapeutic Implications: Mutations predict response to PARP inhibitors (e.g., olaparib, niraparib) in prostate, ovarian, and breast cancer.
+
+BRCA2
+Associated Cancer Type(s): Prostate Cancer, Ovarian Cancer, Pancreatic Cancer, Breast Cancer, Osteosarcoma, Uterine Sarcoma (Leiomyosarcoma - LMS).
+
+Significance/Prognosis: A key gene in homologous recombination repair deficiency (HRD). Germline mutations have significant implications for prostate cancer progression and survival.
+
+Detection Method(s): Genetic testing.
+
+Therapeutic Implications: Mutations predict response to PARP inhibitors (e.g., olaparib, niraparib) in prostate, ovarian, and breast cancer.
+
+Genetic Counseling: Recommended due to high risk of inherited cancer syndromes.
+
+BRIP1
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib).
+
+BTK
+Associated Cancer Type(s): Brain metastases.
+
+Significance/Prognosis: Mentioned as a potential therapeutic target.
+
+Therapeutic Implications: Mentioned in the context of brain metastases treatment.
+
+CALR
+Associated Cancer Type(s): Myeloproliferative Neoplasms (MPN), specifically Primary Myelofibrosis (PMF), Myelodysplastic Syndromes/Myeloproliferative Neoplasms with Ring Sideroblasts and Thrombocytosis (MDS/MPN-RS-T).
+
+Significance/Prognosis: A key driver mutation in PMF. Prognostic models incorporate CALR mutation status.
+
+Detection Method(s): NGS.
+
+Therapeutic Implications: No therapies directly target CALR mutations, but JAK2 inhibitors (e.g., Ruxolitinib) are used for Myelofibrosis regardless of driver mutation status.
+
+CBL
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A gene in the Molecular International Prognosis Scoring System (IPSS-M) for MDS.
+
+CCND1 (Cyclin D1)
+Associated Cancer Type(s): Mantle Cell Lymphoma (MCL), Follicular Lymphoma (FL), Extranodal Marginal Zone B-Cell Lymphoma (EMZL), Splenic Marginal Zone Lymphoma (SMZL).
+
+Significance/Prognosis: Typically positive in MCL (CD5+, CCND1+) and negative in FL. Helps in diagnosis of EMZL and SMZL.
+
+Detection Method(s): IHC panel, FISH.
+
+CCNB3
+Associated Cancer Type(s): Pediatric undifferentiated sarcomas.
+
+Significance/Prognosis: A genetic aberration found in pediatric undifferentiated sarcomas.
+
+Therapeutic Implications: BCOR::CCNB3 fusion-positive tumors can be treated like Ewing sarcoma.
+
+CD79B
+Associated Cancer Type(s): Primary Cutaneous B-Cell Lymphomas (PCBCL).
+
+Significance/Prognosis: Mutations help in distinguishing PC-DLBCL, leg type from PCFCL.
+
+Detection Method(s): Next-Generation Sequencing (NGS).
+
+CDK4/6
+Associated Cancer Type(s): Breast Cancer, Uterine Sarcoma.
+
+Therapeutic Implications: CDK4/6 inhibitors (e.g., abemaciclib, ribociclib) are used for HR-positive, HER2-negative breast cancer.
+
+CDK12
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib, talazoparib).
+
+CDKN1B (p27)
+Associated Cancer Type(s): Hairy Cell Leukemia (HCL), Small Bowel Carcinoid tumors, GEP-NETs.
+
+Significance/Prognosis: Recurrent mutations in HCL. Loss of expression is an adverse prognostic factor in GEP-NETs.
+
+CDKN2A
+Associated Cancer Type(s): Gliomas, Mesothelioma, Uterine Sarcoma (Leiomyosarcoma - LMS).
+
+Significance/Prognosis:
+
+Homozygous deletion is a strong adverse prognostic factor in gliomas and is common in mesothelioma.
+
+Prognostic significance in malignant peritoneal mesothelioma.
+
+Detection Method(s): FISH.
+
+CDX2
+Associated Cancer Type(s): Metastatic carcinoma to the lung.
+
+Detection Method(s): IHC stain.
+
+CEBPA
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis:
+
+In-frame bZIP mutations are associated with favorable outcomes in AML.
+
+Germline mutations are seen in familial AML.
+
+A main effect gene in the IPSS-M for MDS.
+
+Detection Method(s): Molecular and genetic testing.
+
+CHGA (Chromogranin A)
+Associated Cancer Type(s): Neuroendocrine tumors (NETs), Pancreatic Neuroendocrine Tumors, Small Cell Lung Carcinoma (SCLC).
+
+Significance/Prognosis: A secreted protein often elevated in NETs; elevated levels have been associated with poorer prognosis.
+
+CHIC2 deletion
+Associated Cancer Type(s): Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE), specifically FIP1L1::PDGFRA rearrangement; Systemic Mastocytosis (SM).
+
+Significance/Prognosis: A surrogate for the FIP1L1::PDGFRA fusion.
+
+Detection Method(s): FISH, nested RT-PCR, RT-qPCR.
+
+CHOP (fusion partner)
+Associated Cancer Type(s): Myxoid liposarcoma.
+
+Significance/Prognosis: TLS-CHOP fusion transcript structure is a prognostic factor.
+
+CIC
+Associated Cancer Type(s): Pediatric undifferentiated sarcomas.
+
+Therapeutic Implications: CIC::DUX4 fusion-positive tumors can be treated like Ewing sarcoma.
+
+CLDN4 (Claudin-4)
+Associated Cancer Type(s): Mesothelioma.
+
+Detection Method(s): IHC marker.
+
+COMPLEX KARYOTYPE (CK)
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), Chronic Lymphocytic Leukemia (CLL), T-Cell Prolymphocytic Leukemia (TPLL).
+
+Significance/Prognosis:
+
+A poor prognostic factor in AML, often associated with TP53 mutation.
+
+A strong predictor of inferior outcome in relapsed/refractory CLL treated with ibrutinib.
+
+Detection Method(s): Karyotyping.
+
+CREBBP
+Associated Cancer Type(s): Follicular Lymphoma (FL).
+
+Detection Method(s): Next-Generation Sequencing (NGS) panel.
+
+CSF1R
+Associated Cancer Type(s): Histiocytic Neoplasms (LCH, ECD, RDD).
+
+Therapeutic Implications: Pexidartinib is a useful targeted therapy.
+
+CTNNB1 (beta-catenin)
+Associated Cancer Type(s): Sporadic desmoid tumors, Wilms Tumor, Medulloblastomas (WNT-activated).
+
+Significance/Prognosis: Specific mutations correlate with recurrence in desmoid tumors. WNT-activated medulloblastomas have a markedly better prognosis.
+
+CUL1
+Associated Cancer Type(s): Malignant Pleural Mesothelioma.
+
+Significance/Prognosis: Has recurrent alterations in malignant pleural mesothelioma.
+
+CXCR4
+Associated Cancer Type(s): Waldenström Macroglobulinemia/Lymphoplasmacytic Lymphoma (WM/LPL), Multiple Myeloma (MM).
+
+Therapeutic Implications: The presence of this mutation may influence the choice or efficacy of Bruton’s tyrosine kinase (BTK) inhibitors.
+
+DAXX
+Associated Cancer Type(s): Uterine Sarcoma (Leiomyosarcoma - LMS).
+
+Significance/Prognosis: Commonly altered in LMS. Abnormal expression by IHC may favor LMS diagnosis.
+
+DDX41
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS), Acute Myeloid Leukemia (AML).
+
+Significance/Prognosis: Germline mutations define a significant entity within adult MDS/AML.
+
+Therapeutic Implications: A somatic "2nd hit" warrants timely referral for HCT evaluation.
+
+DGCR8
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants in Wilms tumor.
+
+DIAPH1
+Associated Cancer Type(s): Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE).
+
+Significance/Prognosis: A partner gene for PDGFRB fusion.
+
+DICER1
+Associated Cancer Type(s): Uterine sarcomas.
+
+Significance/Prognosis: Has recurrent genetic alterations in uterine sarcomas.
+
+DNMT3A
+Associated Cancer Type(s): AML, BPDCN, MDS, T-Cell Lymphomas, CML, MLNE.
+
+Significance/Prognosis:
+
+Has prognostic significance in AML.
+
+One of the most frequently mutated genes in clonal hematopoiesis of indeterminate potential (CHIP).
+
+Frequently mutated in MDS and nodal T-follicular helper (TFH) cell lymphomas.
+
+DUX4
+Associated Cancer Type(s): Pediatric undifferentiated sarcomas.
+
+Therapeutic Implications: CIC::DUX4 fusion-positive tumors can be treated like Ewing sarcoma.
+
+DUSP22
+Associated Cancer Type(s): Primary Cutaneous CD30+ T-Cell Lymphoproliferative Disorders (PCTLD), Anaplastic Large-Cell Lymphoma (ALCL), ALK negative.
+
+Significance/Prognosis: Associated with high-risk ALK-negative ALCL.
+
+Detection Method(s): FISH.
+
+EBV (Epstein-Barr virus)
+Associated Cancer Type(s): Richter Transformation of CLL, Post-Transplant Lymphoproliferative Disorders (PTLD), Extranodal NK/T-Cell Lymphomas, and others.
+
+Significance/Prognosis: EBV evaluation is critical in PTLD and other lymphomas.
+
+Detection Method(s): EBER-ISH, IHC (LMP1, EBNA2), Quantitative EBV PCR.
+
+EGFR
+Associated Cancer Type(s): Non-Small Cell Lung Cancer (NSCLC), Gliomas.
+
+Significance/Prognosis: EGFR amplification is a high-yield alteration in gliomas. Exon 19 deletion or L858R mutations are associated with less benefit from PD-1/PD-L1 inhibitors in NSCLC.
+
+Therapeutic Implications:
+
+NSCLC: EGFR TKIs (e.g., osimertinib, afatinib) are used for specific mutations. EGFRex20 insertions are targeted by specific agents.
+
+EIF1AX
+Associated Cancer Type(s): Uveal Melanoma.
+
+Significance/Prognosis: Mutations are associated with low risk for distant metastasis.
+
+EIF6
+Associated Cancer Type(s): Shwachman-Diamond Syndrome (associated with MDS/AML predisposition).
+
+Significance/Prognosis: Somatic mutations are associated with the syndrome.
+
+ERBB2 (HER2)
+Associated Cancer Type(s): Breast Cancer, Ovarian Cancer, Gastric Cancer, NSCLC, and many others.
+
+Significance/Prognosis: HER2 status is a critical prognostic and predictive biomarker.
+
+Detection Method(s): IHC, ISH (FISH).
+
+Therapeutic Implications:
+
+Breast Cancer: Trastuzumab deruxtecan for HER2-low disease. Neratinib for HER2-mutated disease.
+
+NSCLC: Trastuzumab deruxtecan for HER2-mutated metastatic NSCLC.
+
+Others: HER2 positivity can predict sensitivity to targeted agents in many cancers.
+
+ERCC6L2
+Associated Cancer Type(s): Marrow failure/AML, MDS, Erythroleukemia.
+
+Significance/Prognosis: Associated with hereditary myeloid malignancy predisposition syndromes and somatic TP53 mutations.
+
+ESR1 (Estrogen Receptor Alpha)
+Associated Cancer Type(s): Breast Cancer.
+
+Therapeutic Implications: For ESR1-mutated tumors after progression on prior endocrine therapy, elacestrant can be considered.
+
+ETNK1
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A main effect gene in the IPSS-M for MDS.
+
+ETV6
+Associated Cancer Type(s): AML, Hereditary Myeloid Malignancy Predisposition Syndromes, MLNE, MDS, GIST.
+
+Significance/Prognosis:
+
+A partner gene for PDGFRA, PDGFRB, ABL1, FLT3 fusions in MLNE.
+
+A main effect gene in the IPSS-M for MDS.
+
+ETV6-NTRK3 is a gene fusion involved in GIST.
+
+Therapeutic Implications: Fusions are targetable (see entries for partner genes).
+
+EZH2
+Associated Cancer Type(s): Follicular Lymphoma (FL), AML, MDS, Myeloproliferative Neoplasms (MPN).
+
+Significance/Prognosis:
+
+Part of the definition for AML-myelodysplasia-related (AML-MR).
+
+A main effect gene in the IPSS-M for MDS.
+
+Adverse mutation in primary myelofibrosis.
+
+Therapeutic Implications: Tazemetostat (an EZH2 inhibitor) is an option for Follicular Lymphoma.
+
+FANCA
+Associated Cancer Type(s): Prostate Cancer, Fanconi Anemia (FA).
+
+Significance/Prognosis: FA is a familial cancer susceptibility syndrome.
+
+Therapeutic Implications: For Prostate Cancer, mutations inform the use of PARP inhibitors (e.g., talazoparib).
+
+FANCL
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib).
+
+FGFR (general)
+Associated Cancer Type(s): Head and Neck Cancers, NSCLC, Esophageal Cancer.
+
+Therapeutic Implications: Erdafitinib is recommended for FGFR mutations or fusions in certain settings.
+
+FGFR1
+Associated Cancer Type(s): MLNE, CMML, "Wild-type" GIST, AML.
+
+Significance/Prognosis: One of the TK gene fusions associated with MLNE. Associated with a high incidence of T-cell lymphoblastic lymphoma/leukemia.
+
+Therapeutic Implications:
+
+MLNE: Pemigatinib (preferred regimen). Other TKIs include Midostaurin or Ponatinib.
+
+Early referral to allogeneic HCT is generally recommended as the only potentially curative option.
+
+FGFR2
+Associated Cancer Type(s): Pancreatic Adenocarcinoma, Bladder Cancer.
+
+Therapeutic Implications: FGFR2 fusions are potentially actionable in pancreatic cancer. Erdafitinib is an option for bladder cancer.
+
+FGFR3
+Associated Cancer Type(s): Bladder Cancer.
+
+Therapeutic Implications: Erdafitinib is an option for bladder cancer.
+
+FH (Fumarate Hydratase)
+Associated Cancer Type(s): Kidney Cancer, Neuroendocrine tumors.
+
+Significance/Prognosis: A hereditary kidney cancer gene.
+
+Detection Method(s): IHC for FH and 2-succinocysteine (2SC).
+
+FLT3
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), MLNE, MDS.
+
+Significance/Prognosis:
+
+FLT3-ITD and FLT3-TKD mutations are critical prognostic and predictive markers in AML.
+
+A partner gene in ETV6::FLT3 fusions in MLNE.
+
+Therapeutic Implications:
+
+AML: Gilteritinib (category 1 recommended therapy). Other options include sorafenib, quizartinib, and midostaurin in various settings.
+
+MLNE: Clinical trial is preferred. Gilteritinib, Midostaurin, and others can be considered.
+
+FOXP1
+Associated Cancer Type(s): Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE).
+
+Significance/Prognosis: A partner gene for PDGFRA fusion.
+
+GATA2
+Associated Cancer Type(s): Hereditary Myeloid Malignancy Predisposition Syndromes, MDS, AML.
+
+Significance/Prognosis: GATA2 deficiency syndrome is a highly penetrant hereditary hematologic malignancy predisposition syndrome. A main effect gene in the IPSS-M for MDS.
+
+GATA3
+Associated Cancer Type(s): Metastatic carcinoma to the lung, Mesothelioma, Pheochromocytoma/Paraganglioma.
+
+Detection Method(s): IHC marker.
+
+GREB1
+Associated Cancer Type(s): Uterine sarcomas.
+
+Significance/Prognosis: Has recurrent genetic alterations in uterine sarcomas.
+
+HAVCR2
+Associated Cancer Type(s): Subcutaneous Panniculitis-Like T-Cell Lymphoma (SPTCL).
+
+Detection Method(s): Germline testing for HAVCR2 mutation is useful.
+
+HOXB13
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A prostate cancer risk gene.
+
+Genetic Counseling: Testing may have utility for family counseling.
+
+HRAS
+Associated Cancer Type(s): Salivary gland tumors.
+
+Detection Method(s): NGS profiling is recommended.
+
+IDH1
+Associated Cancer Type(s): AML, MDS, MPN (Myelofibrosis), MLNE, CNS Tumors (Gliomas).
+
+Significance/Prognosis:
+
+Has prognostic significance in AML. A main effect gene in the IPSS-M for MDS.
+
+IDH1 mutations (R132) are high-yield mutations in gliomas and predict longer survival.
+
+Therapeutic Implications: For AML, Ivosidenib is a recommended therapy. For gliomas, Ivosidenib is an option for IDH1 mutant grade 2 astrocytoma.
+
+IDH2
+Associated Cancer Type(s): AML, BPDCN, MDS, MPN (Myelofibrosis), T-Cell Lymphomas, MLNE, CNS Tumors (Gliomas).
+
+Significance/Prognosis:
+
+Has prognostic significance in AML. A main effect gene in the IPSS-M for MDS.
+
+High incidence in nodal TFH cell lymphomas.
+
+Therapeutic Implications:
+
+AML: Enasidenib is recommended.
+
+MDS: Venetoclax + HMAs shows efficacy for mIDH2.
+
+CNS Tumors: Vorasidenib is an option.
+
+IGHV (Immunoglobulin heavy chain variable region gene)
+Associated Cancer Type(s): CLL/SLL, MCL, EMZL, SMZL, WM/LPL.
+
+Significance/Prognosis: Mutation status is a key prognostic variable in CLL/SLL and helps differentiate other B-cell malignancies.
+
+INO80
+Associated Cancer Type(s): Hepatosplenic T-Cell Lymphoma (HSTCL).
+
+Detection Method(s): NGS panel.
+
+JAK2
+Associated Cancer Type(s): Myeloid/Lymphoid Neoplasms with Eosinophilia (MLNE), Myeloproliferative Neoplasms (MPN) including Primary Myelofibrosis (PMF), Myelodysplastic Syndromes/Myeloproliferative Neoplasms with Ring Sideroblasts and Thrombocytosis (MDS/MPN-RS-T).
+
+Significance/Prognosis:
+
+Fusions: One of the tyrosine kinase (TK) gene fusions associated with MLNE. Common translocations include PCM1::JAK2, ETV6::JAK2, and BCR::JAK2.
+
+CHIP: One of the most frequently mutated genes in clonal hematopoiesis of indeterminate potential (CHIP).
+
+V617F Mutation: A key driver mutation in PMF and other MPNs. Prognostic models incorporate JAK2 mutation status.
+
+Detection Method(s): FISH, RT-PCR, NGS.
+
+Therapeutic Implications:
+
+Fusions: Ruxolitinib is a preferred regimen.
+
+Other TKIs: Fedratinib, Momelotinib, or Pacritinib.
+
+Myelofibrosis (MF): Combination of ruxolitinib and low-dose pegylated interferon alfa-2a has shown clinical benefit.
+
+Curative Option: Early referral to allogeneic HCT is generally recommended.
+
+JAZF1
+Associated Cancer Type(s): Uterine sarcomas.
+
+Significance/Prognosis: Has recurrent genetic alterations in uterine sarcomas.
+
+KIF5B
+Associated Cancer Type(s): NSCLC.
+
+Significance/Prognosis: A fusion partner with RET in NSCLC.
+
+KIT
+Associated Cancer Type(s): AML, Systemic Mastocytosis (SM), MLNE, Gastrointestinal Stromal Tumors (GIST).
+
+Significance/Prognosis:
+
+KIT D816V mutation is a key diagnostic and prognostic marker in SM.
+
+Activating mutations are found in GIST and predict response to TKIs.
+
+Detection Method(s): High-sensitivity testing for KIT D816V is recommended (ASO-qPCR, ddPCR).
+
+Therapeutic Implications:
+
+SM (D816V): Avapritinib and Midostaurin are preferred regimens.
+
+GIST: Imatinib is standard. Sunitinib, regorafenib, and ripretinib are options for imatinib-resistant disease. Avapritinib is used for PDGFRA D842V-mutated GIST.
+
+KLF2
+Associated Cancer Type(s): Splenic Marginal Zone Lymphoma (SMZL).
+
+Significance/Prognosis: Mutation status may help differentiate SMZL from other B-cell lymphomas.
+
+KRAS
+Associated Cancer Type(s): Histiocytic Neoplasms, MDS, Small Bowel Cancer, Colon/Rectal Cancer, NSCLC, Pancreatic Cancer.
+
+Significance/Prognosis:
+
+A common mutation in the MAPK pathway.
+
+A main effect gene in the IPSS-M for MDS.
+
+Therapeutic Implications:
+
+Small Bowel/Colon/Rectal/NSCLC (G12C): Sotorasib or adagrasib are treatment options.
+
+LEF1
+Associated Cancer Type(s): CLL/SLL, Mantle Cell Lymphoma (MCL).
+
+Significance/Prognosis: Positive in CLL/SLL.
+
+Detection Method(s): IHC for LEF1 may help distinguish from variant CLL.
+
+MAX
+Associated Cancer Type(s): Wild-type GIST, Neuroendocrine tumors.
+
+Significance/Prognosis: Can be somatically lost in wild-type GIST cases.
+
+MBD4
+Associated Cancer Type(s): Myeloid Malignancies (AML predisposition), Uveal Melanoma.
+
+Significance/Prognosis: Germline deficiency predisposes to clonal hematopoiesis and early-onset AML.
+
+MECOM
+Associated Cancer Type(s): Hereditary Hematological Malignancies.
+
+Significance/Prognosis: Associated with a heterogeneous inherited bone marrow failure syndrome.
+
+MEN1
+Associated Cancer Type(s): Neuroendocrine tumors (Multiple Endocrine Neoplasia type 1).
+
+Therapeutic Implications: For MEN1-related insulinomas, stabilize glucose with diet, diazoxide, and/or everolimus.
+
+MET
+Associated Cancer Type(s): NSCLC.
+
+Significance/Prognosis: METex14 skipping mutation is a specific biomarker for first-line therapy options in advanced or metastatic NSCLC.
+
+Therapeutic Implications: Capmatinib and tepotinib are preferred regimens. Crizotinib also has activity.
+
+METEX14 (MET exon 14 skipping mutation)
+Associated Cancer Type(s): NSCLC.
+
+Significance/Prognosis: An actionable alteration in NSCLC.
+
+Therapeutic Implications: See MET entry.
+
+MGMT
+Associated Cancer Type(s): CNS Tumors (Gliomas, Glioblastoma).
+
+Significance/Prognosis: MGMT promoter methylation is a key marker of response to temozolomide.
+
+MITF (Microphthalmia-Associated Transcription Factor)
+Associated Cancer Type(s): Perivascular Epithelioid Cell Tumor (PEComa).
+
+MLH1
+Associated Cancer Type(s): Lynch Syndrome-associated cancers (Colorectal, Endometrial, Ovarian, Gastric, etc.).
+
+Significance/Prognosis: One of the four main MMR genes. Loss of expression by IHC indicates dMMR/MSI-H.
+
+Therapeutic Implications: dMMR/MSI-H status predicts response to immune checkpoint inhibitors (pembrolizumab, nivolumab, etc.).
+
+MLL (KMT2A)
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML).
+
+Significance/Prognosis: MLL rearrangement has prognostic significance in AML.
+
+MLL3 (KMT2C)
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A main effect gene in the IPSS-M for MDS.
+
+MLLT1
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants in Wilms tumor.
+
+MONOSOMAL KARYOTYPE
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML).
+
+Significance/Prognosis: A poor prognostic factor, often associated with TP53 mutation.
+
+MONOSOMY 7
+Associated Cancer Type(s): AML, CML, MDS.
+
+Significance/Prognosis: An unfavorable cytogenetic prognosticator.
+
+MPL
+Associated Cancer Type(s): Myeloproliferative Neoplasms (MPN), specifically Primary Myelofibrosis (PMF), MDS/MPN-RS-T.
+
+Significance/Prognosis: A key driver mutation in PMF. Prognostic models incorporate MPL mutation status.
+
+MRE11A
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., talazoparib).
+
+MSH2
+Associated Cancer Type(s): Lynch Syndrome-associated cancers.
+
+Significance/Prognosis: One of the four main MMR genes. Loss of expression by IHC indicates dMMR/MSI-H.
+
+Therapeutic Implications: dMMR/MSI-H status predicts response to immune checkpoint inhibitors.
+
+MSH6
+Associated Cancer Type(s): Lynch Syndrome-associated cancers.
+
+Significance/Prognosis: One of the four main MMR genes. Loss of expression by IHC indicates dMMR/MSI-H.
+
+Therapeutic Implications: dMMR/MSI-H status predicts response to immune checkpoint inhibitors.
+
+MSLN (Mesothelin)
+Associated Cancer Type(s): Mesothelioma, Occult Primary Cancers.
+
+Significance/Prognosis: Soluble mesothelin-related peptide (SMRP) is a prognostic and predictive marker in mesothelioma.
+
+MTAP
+Associated Cancer Type(s): Malignant Peritoneal Mesothelioma.
+
+Detection Method(s): IHC.
+
+MYC
+Associated Cancer Type(s): Burkitt Lymphoma (BL), DLBCL, HGBL, HIV-related B-Cell Lymphomas, and others.
+
+Significance/Prognosis: MYC rearrangements are hallmarks of aggressive lymphomas. HGBL with MYC and BCL2 or BCL6 rearrangements ("double-hit" or "triple-hit") has a very poor prognosis.
+
+Detection Method(s): FISH, IHC.
+
+MYCN
+Associated Cancer Type(s): Neuroblastoma, Wilms tumor.
+
+Significance/Prognosis: MYCN amplification in neuroblastoma correlates with advanced disease and rapid progression.
+
+MYD88
+Associated Cancer Type(s): Waldenström Macroglobulinemia/Lymphoplasmacytic Lymphoma (WM/LPL), Primary Cutaneous B-Cell Lymphomas (PCBCL).
+
+Significance/Prognosis: MYD88 L265P is a commonly recurring mutation in WM, useful for diagnosis.
+
+Detection Method(s): Allele-specific PCR (AS-PCR) for L265P is recommended.
+
+Therapeutic Implications: Useful for patients considered for Bruton's tyrosine kinase (BTK) inhibitors.
+
+MYH9
+Associated Cancer Type(s): Hereditary Hematological Malignancies.
+
+Significance/Prognosis: Associated with MYH9-related disease.
+
+NAPSA (Napsin A)
+Associated Cancer Type(s): Lung Adenocarcinoma, Squamous Cell Carcinoma, SCLC.
+
+Significance/Prognosis: A useful IHC marker for distinguishing lung adenocarcinoma.
+
+NBN
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., talazoparib).
+
+NCAM1 (CD56)
+Associated Cancer Type(s): Small Cell Lung Cancer (SCLC).
+
+NCOA4
+Associated Cancer Type(s): NSCLC.
+
+Significance/Prognosis: A fusion partner with RET in NSCLC.
+
+NF1
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS), GIST.
+
+Significance/Prognosis: Germline mutations define Neurofibromatosis type 1. NF1-associated GIST should be tested for KIT/PDGFRA mutations.
+
+Therapeutic Implications: Data for TKI use in NF1-associated GIST are limited.
+
+Genetic Counseling: Recommended for patients with NF1-associated GIST.
+
+NF2
+Associated Cancer Type(s): Neurofibromatosis type 2 vestibular schwannomas, Malignant Mesothelioma.
+
+Significance/Prognosis: Prognostic significance in malignant peritoneal mesothelioma.
+
+NKX2-1 (TTF-1)
+Associated Cancer Type(s): Lung Adenocarcinoma, Squamous Cell Carcinoma, Thyroid Malignancies.
+
+Significance/Prognosis: A key IHC marker for lung and thyroid origin.
+
+NOTCH2
+Associated Cancer Type(s): Splenic Marginal Zone Lymphoma (SMZL).
+
+Significance/Prognosis: Mutations may be helpful to differentiate SMZL from other B-cell lymphomas.
+
+NPM1
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML).
+
+Significance/Prognosis: NPM1 mutation in the absence of FLT3-ITD or with low-ratio FLT3-ITD is a favorable prognostic marker in AML.
+
+Detection Method(s): Quantitative real-time PCR for monitoring.
+
+NRAS
+Associated Cancer Type(s): AML, BPDCN, MDS, MLNE, Lymphoid Malignancies, Colon/Rectal Cancer.
+
+Significance/Prognosis:
+
+A main effect gene in the IPSS-M for MDS.
+
+Mutations in the MAPK pathway.
+
+NRG1
+Associated Cancer Type(s): NSCLC, Pancreatic Adenocarcinoma.
+
+Significance/Prognosis: NRG1 fusions are associated with HER2-amplified pancreatic ductal adenocarcinoma.
+
+Therapeutic Implications: NRG1 fusions are actionable targets.
+
+NTRK (gene fusions)
+Associated Cancer Type(s): Histiocytic Neoplasms, MLNE, Cervical Cancer, HCC, Occult Primary cancers, Sarcoma, Thyroid Carcinoma, NSCLC, and many others (tumor-agnostic).
+
+Significance/Prognosis: An emerging biomarker across many cancers.
+
+Detection Method(s): Gene fusion assay, FISH, Pan-TRK IHC, RNA sequencing (preferred).
+
+Therapeutic Implications: NTRK gene fusions predict response to TRK inhibitors like Larotrectinib, Entrectinib, and Repotrectinib.
+
+NUP98 rearrangement
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML).
+
+Significance/Prognosis: Has prognostic significance in AML.
+
+PALB2
+Associated Cancer Type(s): Prostate Cancer, Ovarian Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib, talazoparib).
+
+PAX5
+Associated Cancer Type(s): Metastatic carcinoma to the lung.
+
+Detection Method(s): IHC stain.
+
+PAX8
+Associated Cancer Type(s): Malignant Peritoneal Mesothelioma, Metastatic Thyroid Malignancies to the lung.
+
+Detection Method(s): IHC stain.
+
+PDGFRA
+Associated Cancer Type(s): MLNE, CEL, SM, CMML, GIST.
+
+Significance/Prognosis:
+
+FIP1L1::PDGFRA is the most common fusion in MLNE and CEL.
+
+Activating mutations in GIST predict response to TKIs. PDGFRA D842V mutation confers resistance to imatinib.
+
+Therapeutic Implications:
+
+MLNE/CEL: Imatinib is primary treatment.
+
+GIST (D842V): Avapritinib is recommended.
+
+PDGFRB
+Associated Cancer Type(s): MLNE, CMML.
+
+Significance/Prognosis: ETV6::PDGFRB is the most common fusion. Responds to imatinib.
+
+Therapeutic Implications: Imatinib is the primary treatment.
+
+PGR (Progesterone Receptor)
+Associated Cancer Type(s): Uterine Sarcomas.
+
+Therapeutic Implications: For ER/PR-positive uterine sarcomas, aromatase inhibitors are treatment options.
+
+PHF6
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A residual gene in the IPSS-M for MDS.
+
+PIK3CA
+Associated Cancer Type(s): Histiocytic Neoplasms, Rhabdomyosarcoma (RMS), Breast Cancer, NSCLC, Head and Neck Cancers.
+
+Significance/Prognosis: Mutations in the PI3K-AKT-mTOR pathway are common in many cancers.
+
+Therapeutic Implications: Alpelisib is a treatment option for PIK3CA-mutated, HR-positive, HER2-negative advanced breast cancer.
+
+PIK3R1
+Associated Cancer Type(s): Hepatosplenic T-Cell Lymphoma (HSTCL).
+
+Detection Method(s): NGS panel.
+
+POU2F3
+Associated Cancer Type(s): Small Cell Lung Cancer (SCLC).
+
+Significance/Prognosis: A key transcription factor in a subset of SCLC.
+
+PPM1D
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A residual gene in the IPSS-M for MDS.
+
+PRPF8
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A residual gene in the IPSS-M for MDS.
+
+PTCH1
+Associated Cancer Type(s): Medulloblastomas (SHH-activated).
+
+Significance/Prognosis: Defines the SHH-activated subgroup of medulloblastomas.
+
+PTEN
+Associated Cancer Type(s): Breast Cancer, Prostate Cancer, Uterine Sarcoma (LMS), Small Bowel Cancer, Thyroid Cancer.
+
+Significance/Prognosis: A key tumor suppressor gene. Loss is common in many cancers.
+
+Syndrome Association: Germline mutations cause Cowden Syndrome (PHTS).
+
+Therapeutic Implications: Informs use of PI3K/AKT/mTOR pathway inhibitors.
+
+RAD51
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib, talazoparib).
+
+RAD51C
+Associated Cancer Type(s): Prostate Cancer.
+
+Significance/Prognosis: A homologous recombination repair (HRR) gene.
+
+Therapeutic Implications: Mutations inform the use of PARP inhibitors (e.g., olaparib).
+
+RB1
+Associated Cancer Type(s): Uterine Sarcoma (LMS), Prostate Cancer, Neuroendocrine Tumors, Neuroblastoma.
+
+Significance/Prognosis: Commonly altered in LMS and associated with aggressive prostate cancer.
+
+RECEPTOR TYROSINE KINASE/RAS/PIK3CA aberrations
+Associated Cancer Type(s): Rhabdomyosarcoma (RMS).
+
+Significance/Prognosis: Found in 93% of RMS cases.
+
+RET
+Associated Cancer Type(s): Histiocytic Neoplasms, MLNE, NSCLC, Pancreatic Cancer, Sarcoma, Thyroid Carcinoma (Medullary and Anaplastic).
+
+Significance/Prognosis: Somatic RET mutations confer an adverse prognosis in sporadic medullary thyroid carcinoma.
+
+Therapeutic Implications:
+
+NSCLC (fusions): Selpercatinib and pralsetinib are approved.
+
+Thyroid (mutations/fusions): Selpercatinib and pralsetinib are regimen options.
+
+Genetic Counseling: Recommended for medullary thyroid carcinoma due to association with MEN2 syndrome.
+
+ROS1
+Associated Cancer Type(s): NSCLC, Pancreatic Cancer, Occult Primary Cancers.
+
+Significance/Prognosis: ROS1 rearrangements are associated with less benefit from PD-1/PD-L1 inhibitors in NSCLC.
+
+Therapeutic Implications: Entrectinib, crizotinib, and repotrectinib are treatment options for ROS1 fusion-positive NSCLC.
+
+RUNX1
+Associated Cancer Type(s): AML, MDS, MLNE, MPN, HMMPS, SM, CMML, CML.
+
+Significance/Prognosis:
+
+A main effect gene in the IPSS-M for MDS.
+
+Somatic 2nd hit of RUNX1 is a high-risk finding in HMMPS.
+
+Therapeutic Implications: No specific therapies are mentioned for RUNX1 mutations.
+
+SAMD9
+Associated Cancer Type(s): HMMPS, MDS.
+
+Significance/Prognosis: Associated with MIRAGE syndrome and MDS with monosomy 7.
+
+SAMD9L
+Associated Cancer Type(s): HMMPS, MDS.
+
+Significance/Prognosis: Associated with ataxia-pancytopenia syndrome and MDS with monosomy 7.
+
+SDHA/B/C/D
+Associated Cancer Type(s): GIST, Kidney Cancer, Pheochromocytoma/Paraganglioma.
+
+Significance/Prognosis: SDH deficiency is found in GIST lacking KIT/PDGFRA mutations and may have more indolent behavior.
+
+Genetic Counseling: Recommended due to association with hereditary cancer syndromes.
+
+SETBP1
+Associated Cancer Type(s): Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A residual gene in the IPSS-M for MDS.
+
+SETD2
+Associated Cancer Type(s): Hepatosplenic T-Cell Lymphoma (HSTCL).
+
+Detection Method(s): NGS panel.
+
+SFPQ
+Associated Cancer Type(s): Unknown Primary Cancers.
+
+Detection Method(s): IHC marker.
+
+SF3B1
+Associated Cancer Type(s): AML, MDS, MPN (Myelofibrosis), CLL/SLL, Uveal Melanoma.
+
+Significance/Prognosis:
+
+A main effect gene in the IPSS-M for MDS. Most frequently mutated splice factor in MDS.
+
+Mutations define a specific subtype of MDS with ring sideroblasts.
+
+Therapeutic Implications: Luspatercept is a treatment option for MDS with ring sideroblasts and SF3B1 mutation.
+
+SBDS (Shwachman-Bodian-Diamond syndrome gene)
+Associated Cancer Type(s): Hereditary Myeloid Malignancy Predisposition Syndromes.
+
+Significance/Prognosis: Associated with bone marrow failure/AML, MDS, pancreatic insufficiency.
+
+SIX1
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants in Wilms tumor.
+
+SIX2
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants in Wilms tumor.
+
+SMARCA4
+Associated Cancer Type(s): Small Cell Carcinoma of the Ovary, Hypercalcemic Type (SCCOHT).
+
+SOX10
+Associated Cancer Type(s): Melanoma, Cutaneous Melanoma.
+
+Detection Method(s): IHC marker.
+
+SOX11
+Associated Cancer Type(s): Mantle Cell Lymphoma (MCL).
+
+Significance/Prognosis: Expression helps identify cyclin D1-negative MCL.
+
+SRP72
+Associated Cancer Type(s): Hereditary Myeloid Malignancy Predisposition Syndromes.
+
+Significance/Prognosis: Associated with familial aplasia and myelodysplasia.
+
+SRSF2
+Associated Cancer Type(s): AML, BPDCN, CML, CMML, MDS, MPN (Myelofibrosis).
+
+Significance/Prognosis:
+
+A main effect gene in the IPSS-M for MDS.
+
+Adverse mutation in primary myelofibrosis.
+
+STAG2
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), Myelodysplastic Syndromes (MDS).
+
+Significance/Prognosis: A main effect gene in the IPSS-M for MDS.
+
+STAT3
+Associated Cancer Type(s): T-LGLL, ANKL, MDS, HSTCL, ATLL.
+
+Significance/Prognosis: Mutations are commonly found in T-cell LGL disease.
+
+STAT5B
+Associated Cancer Type(s): T-LGLL, ANKL, HSTCL.
+
+Significance/Prognosis: Mutational analysis is useful for T-LGLL.
+
+STAT6
+Associated Cancer Type(s): Follicular Lymphoma (FL).
+
+Detection Method(s): NGS panel.
+
+SYT (fusion partner)
+Associated Cancer Type(s): Synovial sarcoma.
+
+Significance/Prognosis: SYT-SSX fusion is a hallmark of synovial sarcoma.
+
+TCR (T-cell receptor gene rearrangement)
+Associated Cancer Type(s): T-Cell Lymphomas (various subtypes).
+
+Significance/Prognosis: Detection of clonal TCR gene rearrangements is a key diagnostic tool for T-cell malignancies.
+
+TCL1
+Associated Cancer Type(s): T-Cell Prolymphocytic Leukemia (TPLL).
+
+Significance/Prognosis: Overexpression is a major criterion for TPLL diagnosis.
+
+TERT promoter
+Associated Cancer Type(s): CNS Tumors (Gliomas, Glioblastomas).
+
+Significance/Prognosis: TERT promoter mutations are associated with poor prognosis in gliomas.
+
+TFE3
+Associated Cancer Type(s): Perivascular Epithelioid Cell Tumor (PEComa).
+
+Significance/Prognosis: TFE3 gene fusions define a subset of PEComas.
+
+TET2
+Associated Cancer Type(s): AML, BPDCN, MDS, MLNE, MPN, T-Cell Lymphomas.
+
+Significance/Prognosis:
+
+One of the most frequently mutated genes in clonal hematopoiesis of indeterminate potential (CHIP).
+
+Frequently mutated in MDS and nodal TFH cell lymphomas.
+
+Therapeutic Implications: Patients with mutated TET2 in MDS had a higher response rate to Azacitidine.
+
+TET3
+Associated Cancer Type(s): Hepatosplenic T-Cell Lymphoma (HSTCL).
+
+Detection Method(s): NGS panel.
+
+TLS (fusion partner)
+Associated Cancer Type(s): Myxoid liposarcoma.
+
+Significance/Prognosis: TLS-CHOP fusion transcript structure is a prognostic factor.
+
+TNFRSF14
+Associated Cancer Type(s): Follicular Lymphoma (FL).
+
+Detection Method(s): NGS panel.
+
+TP53
+Associated Cancer Type(s): AML, MCL, CLL/SLL, MDS, MPN, Sarcoma, and many others.
+
+Significance/Prognosis:
+
+TP53 mutations are one of the most common and prognostically significant alterations in cancer.
+
+Associated with poor prognosis in AML, MDS, and CLL.
+
+Germline mutations cause Li-Fraumeni syndrome.
+
+Therapeutic Implications:
+
+Richter Transformation (del(17p)/TP53 mut): Clinical trial, CAR T-cell therapy.
+
+MCL (TP53 mut): Zanubrutinib, obinutuzumab, and venetoclax.
+
+TP63 (p63/p40)
+Associated Cancer Type(s): Anaplastic Large-Cell Lymphoma (ALCL), Lung Adenocarcinoma, Squamous Cell Carcinoma.
+
+Detection Method(s): IHC.
+
+TPSAB1
+Associated Cancer Type(s): Hereditary Alpha-Tryptasemia (HαT), Systemic Mastocytosis (SM).
+
+Significance/Prognosis: HαT is characterized by duplications/triplications in TPSAB1. Associated with elevated tryptase and increased risk of severe anaphylaxis.
+
+TRBC1
+Associated Cancer Type(s): Mycosis Fungoides/Sézary Syndrome (MF/SS), HSTCL, ATLL.
+
+Significance/Prognosis: Can contribute to detecting T-cell clonality.
+
+TRIM37
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants.
+
+TRISOMY 8 / +12
+Associated Cancer Type(s): Desmoid Fibromatosis (+8), MDS (+8), CLL (+12), TPLL (+8), HSTCL (+8).
+
+Significance/Prognosis: A common cytogenetic abnormality with varying prognostic impact depending on the disease.
+
+TSC1
+Associated Cancer Type(s): Perivascular Epithelioid Cell Tumor (PEComa), CNS Tumors (SEGA), Kidney Cancer, Pancreatic Neuroendocrine Tumors.
+
+Syndrome Association: Tuberous sclerosis complex.
+
+Therapeutic Implications: Sirolimus or everolimus for PEComa. Everolimus for SEGA.
+
+TSC2
+Associated Cancer Type(s): PEComa, CNS Tumors (SEGA), Kidney Cancer, Uterine Sarcomas.
+
+Syndrome Association: Tuberous sclerosis complex.
+
+Therapeutic Implications: Sirolimus or everolimus for PEComa. Everolimus for SEGA.
+
+TTF-1 (NKX2-1)
+Associated Cancer Type(s): Lung Adenocarcinoma, Squamous Cell Carcinoma, Thyroid Malignancies.
+
+Significance/Prognosis: A key IHC marker for lung and thyroid origin.
+
+U2AF1
+Associated Cancer Type(s): AML, BPDCN, MDS, MPN (Myelofibrosis).
+
+Significance/Prognosis:
+
+A main effect gene in the IPSS-M for MDS.
+
+Adverse mutation in primary myelofibrosis.
+
+UBR5
+Associated Cancer Type(s): Mantle Cell Lymphoma (MCL).
+
+Significance/Prognosis: Mutations support the diagnosis of MCL.
+
+VHL
+Associated Cancer Type(s): CNS Hemangioblastomas, Renal Cell Carcinoma (RCC), Neuroendocrine Tumors.
+
+Syndrome Association: von Hippel-Lindau disease.
+
+Therapeutic Implications: Belzutifan is a useful therapy for VHL-associated tumors (CNS Hemangioblastomas, RCC, Neuroendocrine Tumors).
+
+WT1
+Associated Cancer Type(s): MDS, Wilms tumor, Unknown Primary Cancers, Mesothelioma.
+
+Significance/Prognosis: A residual gene in the IPSS-M for MDS. A key tumor suppressor gene in Wilms tumor.
+
+WTX (AMER-1)
+Associated Cancer Type(s): Wilms tumor.
+
+Significance/Prognosis: One of the most common somatic variants in Wilms tumor.
+
+ZRSR2
+Associated Cancer Type(s): Acute Myeloid Leukemia (AML), BPDCN, MDS, MLNE.
+
+Significance/Prognosis: A main effect gene in the IPSS-M for MDS. Frequently mutated in MDS.
+
+Detection Method(s): Next-Generation Sequencing (NGS).
