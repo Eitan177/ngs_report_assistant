@@ -176,7 +176,7 @@ def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
 
 # --- UI Rendering Functions ---
 def display_oncokb_results(data, hugo_symbol, alteration):
-    """Displays the formatted OncoKB results in an expander."""
+    """Displays the formatted OncoKB results in a tab."""
     
     if 'error' in data:
         st.error(data['error'])
@@ -221,7 +221,6 @@ st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. 
 st.sidebar.header("2. Query Options")
 tumor_type = st.sidebar.text_input("Tumor Type (Applied to all variants)", placeholder="e.g., Melanoma")
 
-# **ADDED:** API Key status indicator for debugging.
 st.sidebar.divider()
 api_token = st.secrets.get("ONCOKB_API_KEY")
 if api_token:
@@ -254,12 +253,17 @@ if st.sidebar.button("Process Variants", type="primary"):
                 # --- OncoKB Results Section ---
                 st.header("OncoKB Results")
                 with st.spinner("Querying OncoKB for all variants..."):
-                    for index, row in df.iterrows():
-                        gene = row['Gene']
-                        alt = row['Alteration']
-                        with st.expander(f"**{gene} p.{alt}**", expanded=(index == 0)):
-                            data = get_oncokb_data(gene, alt, tumor_type, api_token)
-                            display_oncokb_results(data, gene, alt)
+                    # **CHANGED:** Create a list of labels for the tabs
+                    oncokb_tabs_list = [f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()]
+                    if oncokb_tabs_list:
+                        oncokb_tabs = st.tabs(oncokb_tabs_list)
+                        for i, row in df.iterrows():
+                            # Use the created tab context
+                            with oncokb_tabs[i]:
+                                gene = row['Gene']
+                                alt = row['Alteration']
+                                data = get_oncokb_data(gene, alt, tumor_type, api_token)
+                                display_oncokb_results(data, gene, alt)
                 
                 # --- NCCN Information Section ---
                 if nccn_data:
@@ -298,3 +302,4 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
