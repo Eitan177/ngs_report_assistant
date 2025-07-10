@@ -54,14 +54,13 @@ def get_level_class(level):
     return level_map.get(level, 'gray')
 
 # --- Data Parsing Functions ---
-def parse_nccn_file(uploaded_file):
-    """Parses the uploaded NCCN text file with a more robust strategy."""
-    if uploaded_file is None:
+def parse_nccn_text(text):
+    """Parses the NCCN text content into a dictionary."""
+    if not text:
         return {}
     
-    text = uploaded_file.getvalue().decode('utf-8-sig')
     nccn_data = {}
-    
+    # This regex splits the file into blocks before each line that looks like a gene header.
     gene_blocks = re.split(r'\n(?=\s*[A-Z0-9]{2,10}\s*\n)', text)
     
     for block in gene_blocks:
@@ -209,7 +208,6 @@ def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_ap
     
     full_prompt = prompt_context + prompt_task
     
-    # **FIX:** Changed model from 'gemini-pro' to 'gemini-1.5-flash'
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
     headers = {'Content-Type': 'application/json'}
     payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
@@ -263,8 +261,14 @@ st.title("NGS Report Assistant")
 # --- Sidebar Inputs ---
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
-nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
-st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. You can use '---' to separate entries if you wish.")
+
+# **CHANGED:** Set the default value for the GitHub URL input
+nccn_github_url = st.sidebar.text_input(
+    "NCCN File GitHub URL", 
+    value="https://raw.githubusercontent.com/Eitan177/ngs_report_assistant/refs/heads/main/nccn_cleaned.txt"
+)
+nccn_file_upload = st.sidebar.file_uploader("NCCN Information File (Fallback)", type=['txt'])
+st.sidebar.info("Provide a GitHub URL for the NCCN file (preferred) or upload it directly. The URL will be used if provided.")
 
 
 st.sidebar.header("2. Query Options")
@@ -292,7 +296,20 @@ if st.sidebar.button("Process Variants", type="primary"):
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
-        nccn_data = parse_nccn_file(nccn_file)
+        nccn_text = ""
+        if nccn_github_url:
+            try:
+                response = requests.get(nccn_github_url)
+                response.raise_for_status()
+                nccn_text = response.text
+                st.sidebar.info("Loaded NCCN data from GitHub URL.")
+            except Exception as e:
+                st.sidebar.error(f"Failed to load from URL: {e}")
+        elif nccn_file_upload:
+            nccn_text = nccn_file_upload.getvalue().decode('utf-8-sig')
+            st.sidebar.info("Loaded NCCN data from uploaded file.")
+        
+        nccn_data = parse_nccn_text(nccn_text)
         
         parsing_result = parse_molecular_report(report_file)
         if parsing_result is None:
@@ -310,7 +327,6 @@ if st.sidebar.button("Process Variants", type="primary"):
                     st.text_area("Log", debug_log, height=300)
             else:
                 st.success(f"Successfully parsed {len(df)} variants from the report.")
-                # Store data for summary generation later
                 all_oncokb_data = []
                 for index, row in df.iterrows():
                     data = get_oncokb_data(row['Gene'], row['Alteration'], tumor_type, oncokb_api_token)
