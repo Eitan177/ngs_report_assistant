@@ -51,15 +51,17 @@ def get_level_class(level):
 
 # --- Data Parsing Functions ---
 def parse_nccn_file(uploaded_file):
-    """Parses the uploaded NCCN text file formatted with Markdown headers."""
+    """Parses the uploaded NCCN text file with a more robust strategy."""
     if uploaded_file is None:
         return {}
     
-    text = uploaded_file.getvalue().decode('utf-8')
+    # Use utf-8-sig to handle potential Byte Order Mark (BOM) at the start of the file
+    text = uploaded_file.getvalue().decode('utf-8-sig')
     nccn_data = {}
     
-    # **FIX:** Split the file by the Markdown H3 header '### '
-    gene_blocks = text.split('### ')
+    # **FIX:** This new regex splits the file into blocks before each line that looks like a gene header.
+    # It looks for a newline, followed by a capitalized word (the gene) that is on a line by itself.
+    gene_blocks = re.split(r'\n(?=\s*[A-Z0-9]{2,10}\s*\n)', text)
     
     for block in gene_blocks:
         block = block.strip()
@@ -67,15 +69,14 @@ def parse_nccn_file(uploaded_file):
             continue
         
         lines = block.split('\n')
-        # The first line is the header containing the gene name.
-        header_line = lines[0].strip()
-        # The gene is the first word in the header.
-        gene_name = header_line.split()[0].upper()
-        
-        # A simple check to ensure the gene name looks like a gene name
-        if gene_name and re.match(r'^[A-Z0-9]+$', gene_name):
-            # Add the entire block of text to the dictionary under that gene name
-            nccn_data[gene_name] = block
+        # The first line is assumed to be the gene name.
+        if lines and lines[0].strip():
+            gene_name = lines[0].strip().upper()
+            # Clean any non-alphanumeric characters from the name
+            gene_name = re.sub(r'[^A-Z0-9]', '', gene_name)
+            
+            if gene_name:
+                nccn_data[gene_name] = block
             
     return nccn_data
 
@@ -216,7 +217,7 @@ st.title("OncoKB Batch Variant Querier")
 st.sidebar.header("1. Upload Files")
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
 nccn_file = st.sidebar.file_uploader("NCCN Information File (Optional)", type=['txt'])
-st.sidebar.info("Format your NCCN .txt file with each gene entry starting with '### GENE_NAME'.")
+st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. You can use '---' to separate entries if you wish.")
 
 
 st.sidebar.header("2. Query Options")
@@ -267,7 +268,7 @@ if st.sidebar.button("Process Variants", type="primary"):
                             with nccn_tabs[i]:
                                 # Find the corresponding info, case-insensitive
                                 info = nccn_data.get(gene.upper(), f"No NCCN information found for {gene} in the uploaded file.")
-                                st.markdown(info, unsafe_allow_html=True)
+                                st.markdown(info)
                     else:
                         st.warning("No unique genes found in the report to display NCCN info.")
 
@@ -295,4 +296,5 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
 
