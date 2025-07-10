@@ -1,6 +1,7 @@
 requests
 pandas
 pdfplumber
+openpyxl
 pytesseract
 Pillow
 streamlit
