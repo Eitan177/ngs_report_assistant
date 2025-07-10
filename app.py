@@ -9,7 +9,8 @@
 
 # To deploy on Streamlit Community Cloud:
 # 1. Create a GitHub repository with this app.py file.
-# 2. Create a file named 'requirements.txt' in the repository with the following content:
+# 2. Add your OncoKB API key as a secret named ONCOKB_API_KEY in your app's settings on Streamlit Cloud.
+# 3. Create a file named 'requirements.txt' in the repository with the following content:
 #    requests
 #    pandas
 #    pdfplumber
@@ -18,10 +19,10 @@
 #    streamlit
 #    streamlit-option-menu
 #
-# 3. Create a file named 'packages.txt' in the repository with the following content:
+# 4. Create a file named 'packages.txt' in the repository with the following content:
 #    tesseract-ocr
 #
-# 4. Deploy the app from your Streamlit Community Cloud account, pointing to your GitHub repository.
+# 5. Deploy the app from your Streamlit Community Cloud account, pointing to your GitHub repository.
 
 import streamlit as st
 import requests
@@ -59,8 +60,7 @@ def parse_nccn_file(uploaded_file):
     text = uploaded_file.getvalue().decode('utf-8-sig')
     nccn_data = {}
     
-    # **FIX:** This new regex splits the file into blocks before each line that looks like a gene header.
-    # It looks for a newline, followed by a capitalized word (the gene) that is on a line by itself.
+    # This regex splits the file into blocks before each line that looks like a gene header.
     gene_blocks = re.split(r'\n(?=\s*[A-Z0-9]{2,10}\s*\n)', text)
     
     for block in gene_blocks:
@@ -69,10 +69,8 @@ def parse_nccn_file(uploaded_file):
             continue
         
         lines = block.split('\n')
-        # The first line is assumed to be the gene name.
         if lines and lines[0].strip():
             gene_name = lines[0].strip().upper()
-            # Clean any non-alphanumeric characters from the name
             gene_name = re.sub(r'[^A-Z0-9]', '', gene_name)
             
             if gene_name:
@@ -221,7 +219,8 @@ st.sidebar.info("Format your NCCN .txt file with the gene name on its own line. 
 
 
 st.sidebar.header("2. Query Options")
-api_token = st.sidebar.text_input("OncoKB API Token (Optional)", type="password")
+# **REMOVED:** The API token input is no longer needed in the UI.
+# api_token = st.sidebar.text_input("OncoKB API Token (Optional)", type="password")
 tumor_type = st.sidebar.text_input("Tumor Type (Applied to all variants)", placeholder="e.g., Melanoma")
 
 # --- Main Processing Logic ---
@@ -229,6 +228,10 @@ if st.sidebar.button("Process Variants", type="primary"):
     if report_file is None:
         st.warning("Please upload a molecular report file.")
     else:
+        # **ADDED:** Securely access the API key from Streamlit's secrets management.
+        # This will be None if not running on Streamlit Cloud or if the secret isn't set.
+        api_token = st.secrets.get("ONCOKB_API_KEY")
+
         # Parse NCCN data
         nccn_data = parse_nccn_file(nccn_file)
         
@@ -254,6 +257,7 @@ if st.sidebar.button("Process Variants", type="primary"):
                         gene = row['Gene']
                         alt = row['Alteration']
                         with st.expander(f"**{gene} p.{alt}**", expanded=(index == 0)):
+                            # Pass the retrieved api_token to the function
                             data = get_oncokb_data(gene, alt, tumor_type, api_token)
                             display_oncokb_results(data, gene, alt)
                 
@@ -296,5 +300,3 @@ else:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
-
