@@ -2,7 +2,7 @@
 # To run this app locally:
 # 1. Follow the installation steps for Tesseract-OCR from the previous version.
 # 2. Install the required Python libraries:
-#    pip install streamlit streamlit-option-menu requests pandas pdfplumber pytesseract Pillow
+#    pip install streamlit streamlit-option-menu requests pandas pdfplumber pytesseract Pillow llama-parse
 # 3. Save this code as a Python file (e.g., app.py).
 # 4. Run it from your terminal:
 #    streamlit run app.py
@@ -12,6 +12,7 @@
 # 2. Add your API keys as secrets in your app's settings on Streamlit Cloud:
 #    - ONCOKB_API_KEY = "your-oncokb-key"
 #    - GEMINI_API_KEY = "your-google-ai-key"
+#    - LLAMA_CLOUD_API_KEY = "your-llamaclou-key"
 # 3. Create a file named 'requirements.txt' in the repository with the following content:
 #    requests
 #    pandas
@@ -20,6 +21,7 @@
 #    Pillow
 #    streamlit
 #    streamlit-option-menu
+#    llama-parse
 #
 # 4. Create a file named 'packages.txt' in the repository with the following content:
 #    tesseract-ocr
@@ -36,6 +38,8 @@ from urllib.parse import quote
 import pdfplumber
 import pytesseract
 from PIL import Image, ImageEnhance
+from llama_parse import LlamaParse
+import os
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -60,7 +64,6 @@ def parse_nccn_text(text):
         return {}
     
     nccn_data = {}
-    # This regex splits the file into blocks before each line that looks like a gene header.
     gene_blocks = re.split(r'\n(?=\s*[A-Z0-9]{2,10}\s*\n)', text)
     
     for block in gene_blocks:
@@ -79,73 +82,88 @@ def parse_nccn_text(text):
     return nccn_data
 
 
-def parse_molecular_report(uploaded_file):
+def parse_molecular_report(uploaded_file, llama_api_key):
     """
     Parses the uploaded molecular report file.
-    For CSV/XLS, it returns the raw DataFrame. For PDF, it returns a processed DataFrame.
+    Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
-    file_bytes = io.BytesIO(uploaded_file.getvalue())
+    file_bytes = uploaded_file.getvalue()
     
     try:
-        if 'csv' in filename:
-            return (pd.read_csv(file_bytes), None)
-        elif 'xls' in filename:
-            return (pd.read_excel(file_bytes), None)
+        if 'csv' in filename or 'xls' in filename:
+            df = pd.read_excel(file_bytes) if 'xls' in filename else pd.read_csv(io.BytesIO(file_bytes))
+            return (df, None) # The main logic will handle column mapping
+        
         elif 'pdf' in filename:
             variants = []
             debug_log = "--- PDF PARSING LOG ---\n"
-            full_ocr_text = ""
-            
+            full_extracted_text = ""
             line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense)\s+variant\s+(?:Details\s+)?([^\s,]+)')
-
-            with pdfplumber.open(file_bytes) as pdf:
-                debug_log += f"Successfully opened PDF. Found {len(pdf.pages)} pages.\n"
+            
+            # --- Method 1: pdfplumber + OCR ---
+            debug_log += "Attempting Method 1: Standard OCR...\n"
+            with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
                 for i, page in enumerate(pdf.pages):
                     page_text = page.extract_text()
-                    
                     if not page_text or page_text.strip() == "":
-                        debug_log += f"Page {i+1}: No text extracted. Attempting OCR...\n"
                         try:
                             img = page.to_image(resolution=300).original
                             img = img.convert('L')
                             enhancer = ImageEnhance.Contrast(img)
                             img = enhancer.enhance(2)
-                            
-                            ocr_text = pytesseract.image_to_string(img)
-                            page_text = ocr_text
-                            full_ocr_text += ocr_text + "\n\n"
-                            debug_log += f"Page {i+1}: OCR extracted {len(page_text)} characters.\n"
-                        except Exception as ocr_error:
-                            debug_log += f"Page {i+1}: OCR failed. Tesseract may not be installed correctly. Error: {ocr_error}\n"
+                            page_text = pytesseract.image_to_string(img)
+                            full_extracted_text += page_text + "\n\n"
+                        except Exception:
                             continue
-                    else:
-                        debug_log += f"Page {i+1}: Standard text extraction found {len(page_text)} characters.\n"
-
+                    
                     for line in page_text.split('\n'):
                         match = line_finder_re.search(line)
                         if match:
-                            gene = match.group(1)
-                            alteration = match.group(2)
-                            
+                            gene, alteration = match.group(1), match.group(2)
                             if 'p.' in alteration.lower():
                                 alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
-                            
                             variants.append({'Gene': gene, 'Alteration': alteration})
+
+            # --- Method 2: LlamaParse Fallback ---
+            if not variants and llama_api_key:
+                debug_log += "\nMethod 1 failed. Attempting Method 2: LlamaParse...\n"
+                try:
+                    # LlamaParse needs the file path
+                    with open("temp_report.pdf", "wb") as f:
+                        f.write(file_bytes)
+                    
+                    parser = LlamaParse(api_key=llama_api_key, result_type="markdown")
+                    documents = parser.load_data("temp_report.pdf")
+                    llama_text = documents[0].get_text()
+                    debug_log += f"LlamaParse successfully extracted {len(llama_text)} characters.\n"
+                    full_extracted_text = llama_text
+                    
+                    for line in llama_text.split('\n'):
+                        match = line_finder_re.search(line)
+                        if match:
+                            gene, alteration = match.group(1), match.group(2)
+                            if 'p.' in alteration.lower():
+                                alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
+                            variants.append({'Gene': gene, 'Alteration': alteration})
+                    os.remove("temp_report.pdf") # Clean up temp file
+                except Exception as e:
+                    debug_log += f"LlamaParse failed with error: {e}\n"
+                    if os.path.exists("temp_report.pdf"):
+                        os.remove("temp_report.pdf")
 
             if variants:
                 df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
                 return (df, None)
             else:
-                debug_log += "\n--- FULL EXTRACTED TEXT ---\n" + (full_ocr_text or "No text was extracted from any page.")
+                debug_log += "\n--- FULL EXTRACTED TEXT (from last attempt) ---\n" + (full_extracted_text or "No text was extracted.")
                 return (pd.DataFrame(), debug_log)
 
     except Exception as e:
-        error_message = f"A critical error occurred during file parsing: {e}"
-        return (None, error_message)
+        return (None, f"A critical error occurred: {e}")
 
 # --- API Call Functions ---
 @st.cache_data
@@ -262,7 +280,7 @@ nccn_github_url = st.sidebar.text_input(
     value="https://raw.githubusercontent.com/Eitan177/ngs_report_assistant/refs/heads/main/nccn_cleaned.txt"
 )
 nccn_file_upload = st.sidebar.file_uploader("NCCN Information File (Fallback)", type=['txt'])
-st.sidebar.info("Provide a GitHub URL for the NCCN file (preferred) or upload it directly. The URL will be used if provided.")
+st.sidebar.info("Provide a GitHub URL for the NCCN file (preferred) or upload it directly.")
 
 
 st.sidebar.header("2. Query Options")
@@ -280,6 +298,13 @@ if gemini_api_key:
     st.sidebar.success("Gemini API key found.")
 else:
     st.sidebar.warning("Gemini API key not found. Summary generation will be disabled.")
+
+# **ADDED:** LlamaParse API Key Check
+llama_api_key = st.secrets.get("LLAMA_CLOUD_API_KEY")
+if llama_api_key:
+    st.sidebar.success("LlamaParse API key found.")
+else:
+    st.sidebar.warning("LlamaParse API key not found. Advanced PDF parsing will be disabled.")
 st.sidebar.divider()
 
 # --- Initialize Session State ---
@@ -331,26 +356,25 @@ if st.sidebar.button("Process Variants", type="primary"):
         st.session_state.nccn_data = parse_nccn_text(nccn_text)
         st.session_state.tumor_type = tumor_type
         
-        parsing_result = parse_molecular_report(report_file)
+        parsing_result = parse_molecular_report(report_file, llama_api_key)
         if parsing_result is None:
             st.error("The file parser returned an unexpected error.")
         else:
             df, debug_log = parsing_result
             
-            if df is None or df.empty:
+            if df is None or ('Gene' not in df.columns or 'Alteration' not in df.columns):
+                 st.session_state.raw_df = df
+                 st.session_state.column_selection_needed = True
+            elif df.empty:
                 st.error("Could not parse any variants from the molecular report.")
                 if debug_log:
                     st.subheader("PDF/File Parsing Debug Log")
                     st.text_area("Log", debug_log, height=300)
-            # This handles CSV/XLS files that need column mapping
-            elif 'Gene' not in df.columns or 'Alteration' not in df.columns:
-                st.session_state.raw_df = df
-                st.session_state.column_selection_needed = True
             else:
                 process_dataframe(df)
 
 # --- Interactive Column Selection UI ---
-if st.session_state.column_selection_needed:
+if st.session_state.get('column_selection_needed', False):
     st.warning("Could not automatically identify 'Gene' and 'Alteration' columns.")
     st.info("Please select the correct columns from your file below:")
     
