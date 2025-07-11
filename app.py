@@ -99,14 +99,12 @@ def extract_variants_from_text(text):
     for line in text.split('\n'):
         line = line.strip()
         
-        # **NEW LOGIC:** Specifically handle Markdown table rows
         if line.startswith('|') and line.endswith('|'):
             parts = [p.strip() for p in line.split('|')]
             if len(parts) >= 4:
                 gene = parts[1]
                 details = parts[3]
                 
-                # Skip header/separator rows
                 if gene.upper() == 'GENE' or '---' in gene:
                     continue
 
@@ -127,7 +125,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
     if uploaded_file is None:
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
-    filename = uploaded_file.name
+    filename = uploaded_file.name.lower()
     file_bytes = uploaded_file.getvalue()
     
     try:
@@ -152,7 +150,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                             img = enhancer.enhance(2)
                             page_text = pytesseract.image_to_string(img)
                         except Exception:
-                            page_text = "" # Ensure page_text is a string
+                            page_text = "" 
                     
                     full_extracted_text += page_text + "\n\n"
                     variants.extend(extract_variants_from_text(page_text))
@@ -182,6 +180,29 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             else:
                 debug_log += "\n--- FULL EXTRACTED TEXT (from last attempt) ---\n" + (full_extracted_text or "No text was extracted.")
                 return (pd.DataFrame(), debug_log)
+
+        # **ADDED:** Logic to handle image files
+        elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
+            debug_log = "--- IMAGE PARSING LOG ---\n"
+            try:
+                img = Image.open(io.BytesIO(file_bytes))
+                img = img.convert('L')
+                enhancer = ImageEnhance.Contrast(img)
+                img = enhancer.enhance(2)
+                
+                text = pytesseract.image_to_string(img)
+                debug_log += f"Successfully extracted {len(text)} characters from image.\n"
+                
+                variants = extract_variants_from_text(text)
+                if variants:
+                    df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
+                    return (df, None)
+                else:
+                    debug_log += "\n--- FULL EXTRACTED TEXT ---\n" + text
+                    return (pd.DataFrame(), debug_log)
+            except Exception as e:
+                return (None, f"An error occurred during image processing: {e}")
+
 
     except Exception as e:
         return (None, f"A critical error occurred: {e}")
@@ -294,7 +315,8 @@ st.title("NGS Report Assistant")
 
 # --- Sidebar Inputs ---
 st.sidebar.header("1. Upload Files")
-report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx'])
+# **CHANGED:** Added image formats to the uploader
+report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx', 'png', 'jpg', 'jpeg'])
 
 nccn_github_url = st.sidebar.text_input(
     "NCCN File GitHub URL", 
@@ -385,11 +407,11 @@ if st.sidebar.button("Process Variants", type="primary"):
         else:
             df, debug_log = parsing_result
             
-            is_pdf = 'pdf' in report_file.name.lower()
+            is_tabular = any(ext in report_file.name.lower() for ext in ['.csv', '.xls'])
             
             if df is not None and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
                 process_dataframe(df)
-            elif df is not None and not is_pdf:
+            elif df is not None and is_tabular:
                 st.session_state.raw_df = df
                 st.session_state.column_selection_needed = True
             else:
@@ -495,3 +517,4 @@ elif not st.session_state.column_selection_needed:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
