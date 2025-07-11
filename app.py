@@ -362,6 +362,9 @@ if 'results_df' not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
 if 'narrative_summary' not in st.session_state:
     st.session_state.narrative_summary = ""
+# **FIX:** Initialize all_oncokb_data to prevent AttributeError
+if 'all_oncokb_data' not in st.session_state:
+    st.session_state.all_oncokb_data = []
 
 def process_dataframe(df):
     """The main logic for processing a finalized DataFrame."""
