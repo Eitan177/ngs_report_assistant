@@ -369,11 +369,13 @@ if st.sidebar.button("Process Variants", type="primary"):
         else:
             df, debug_log = parsing_result
             
-            # **FIX:** This new logic correctly routes different parsing outcomes.
-            if isinstance(df, pd.DataFrame) and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
-                # Success case
+            # **FIXED:** This new logic correctly routes different parsing outcomes.
+            is_pdf = 'pdf' in report_file.name.lower()
+            
+            if df is not None and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
+                # Success case for PDF or correctly formatted CSV/XLS
                 process_dataframe(df)
-            elif isinstance(df, pd.DataFrame) and ('Gene' not in df.columns or 'Alteration' not in df.columns):
+            elif df is not None and not is_pdf:
                 # CSV/XLS needs column mapping
                 st.session_state.raw_df = df
                 st.session_state.column_selection_needed = True
@@ -481,5 +483,4 @@ elif not st.session_state.column_selection_needed:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
 
