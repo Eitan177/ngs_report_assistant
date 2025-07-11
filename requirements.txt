@@ -1,5 +1,5 @@
 requests
-llama_parse
+llama-parse
 pandas
 pdfplumber
 openpyxl
