@@ -362,7 +362,6 @@ if 'results_df' not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
 if 'narrative_summary' not in st.session_state:
     st.session_state.narrative_summary = ""
-# **FIX:** Initialize all_oncokb_data to prevent AttributeError
 if 'all_oncokb_data' not in st.session_state:
     st.session_state.all_oncokb_data = []
 
@@ -485,7 +484,8 @@ elif st.session_state.step == "results":
     oncokb_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
         oncokb_tabs = st.tabs(oncokb_tabs_list)
-        for i, row in df.iterrows():
+        # **FIX:** Use enumerate to get a safe, sequential index `i` for the list
+        for i, (df_index, row) in enumerate(df.iterrows()):
             with oncokb_tabs[i]:
                 display_oncokb_results(all_oncokb_data[i], row['Gene'], row['Alteration'])
     
@@ -508,7 +508,8 @@ elif st.session_state.step == "results":
         ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
         if ai_tabs_list:
             ai_tabs = st.tabs(ai_tabs_list)
-            for i, row in df.iterrows():
+            # **FIX:** Use enumerate here as well for safety
+            for i, (df_index, row) in enumerate(df.iterrows()):
                 with ai_tabs[i]:
                     gene = row['Gene']
                     alt = row['Alteration']
