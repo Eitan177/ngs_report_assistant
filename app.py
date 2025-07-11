@@ -91,29 +91,33 @@ def parse_nccn_text(text):
 
 
 def extract_variants_from_text(text):
-    """Helper function to extract variants from a block of text, supporting Markdown tables."""
+    """
+    Helper function to extract variants from a block of text.
+    This version is more robust for OCR'd plain text.
+    """
     variants = []
-    # Regex to find a p. alteration, including those with '?'
-    alteration_re = re.compile(r'(p\.[A-Za-z0-9*?fs>_]+)')
-
+    # Regex to find a p. alteration, including those with '?' or OCR errors.
+    alteration_re = re.compile(r'(p\.[A-Za-z0-9*?fs>_]+)', re.IGNORECASE)
+    
     for line in text.split('\n'):
         line = line.strip()
         
-        if line.startswith('|') and line.endswith('|'):
-            parts = [p.strip() for p in line.split('|')]
-            if len(parts) >= 4:
-                gene = parts[1]
-                details = parts[3]
+        # This regex looks for a gene-like word, then the word "variant", then details.
+        # It's designed to be flexible with the text between the gene and the alteration.
+        line_match = re.search(r'\b([A-Z0-9]{2,10})\b\s+.*variant\s+(.*)', line, re.IGNORECASE)
+        
+        if line_match:
+            gene = line_match.group(1)
+            details = line_match.group(2)
+            
+            # Now, find the specific p. alteration within the details part.
+            alteration_match = alteration_re.search(details)
+            if alteration_match:
+                alteration = alteration_match.group(1)
                 
-                if gene.upper() == 'GENE' or '---' in gene:
-                    continue
-
-                match = alteration_re.search(details)
-                if match:
-                    alteration = match.group(1)
-                    cleaned_gene = re.sub(r'[^A-Z0-9]', '', gene).upper()
-                    if cleaned_gene:
-                        variants.append({'Gene': cleaned_gene, 'Alteration': alteration})
+                # Final check to avoid capturing header words
+                if gene.upper() not in ['GENE', 'TYPE', 'DETAILS']:
+                    variants.append({'Gene': gene, 'Alteration': alteration})
     return variants
 
 
@@ -181,7 +185,6 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                 debug_log += "\n--- FULL EXTRACTED TEXT (from last attempt) ---\n" + (full_extracted_text or "No text was extracted.")
                 return (pd.DataFrame(), debug_log)
 
-        # **ADDED:** Logic to handle image files
         elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
             debug_log = "--- IMAGE PARSING LOG ---\n"
             try:
@@ -315,7 +318,6 @@ st.title("NGS Report Assistant")
 
 # --- Sidebar Inputs ---
 st.sidebar.header("1. Upload Files")
-# **CHANGED:** Added image formats to the uploader
 report_file = st.sidebar.file_uploader("Molecular Report", type=['pdf', 'csv', 'xlsx', 'png', 'jpg', 'jpeg'])
 
 nccn_github_url = st.sidebar.text_input(
@@ -470,7 +472,7 @@ if not st.session_state.results_df.empty and not st.session_state.column_selecti
         st.divider()
 
     st.header("OncoKB Results")
-    oncokb_tabs_list = [f"{row['Gene']} p.{row['Alteration']}" for index, row in df.iterrows()]
+    oncokb_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
         oncokb_tabs = st.tabs(oncokb_tabs_list)
         for i, row in df.iterrows():
@@ -500,7 +502,7 @@ if not st.session_state.results_df.empty and not st.session_state.column_selecti
                 with ai_tabs[i]:
                     gene = row['Gene']
                     alt = row['Alteration']
-                    query_text = f"what is the clinical significance of {gene} p.{alt}"
+                    query_text = f"what is the clinical significance of {gene} {alt}"
                     if tumor_type:
                         query_text += f" in {tumor_type}"
                     
