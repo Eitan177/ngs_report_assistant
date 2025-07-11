@@ -204,7 +204,7 @@ def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
     """
     api_alteration = alteration
     
-    if api_alteration == 'p.?':
+    if api_alteration.lower() == 'p.?':
         api_alteration = 'X1000_splice'
     elif isinstance(api_alteration, str) and api_alteration.lower().startswith('p.'):
         api_alteration = api_alteration[2:]
@@ -288,7 +288,10 @@ def display_oncokb_results(data_tuple, hugo_symbol, alteration):
         query = data.get('query', {})
         
         link_alteration = alteration
-        if link_alteration.lower().startswith('p.'):
+        # **FIX:** Correctly handle splice variant for link generation
+        if link_alteration.lower() == 'p.?':
+            link_alteration = 'X1000_splice'
+        elif link_alteration.lower().startswith('p.'):
             link_alteration = link_alteration[2:]
         oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{link_alteration}"
         
@@ -307,7 +310,12 @@ def display_oncokb_results(data_tuple, hugo_symbol, alteration):
                 indication = treatment.get('indication', {}).get('name', 'N/A')
                 pmids = ", ".join([f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})" for pmid in treatment.get('pmids', [])])
                 
+                # **ADDED:** Display the associated cancer types for the treatment level
+                cancer_types = ", ".join(treatment.get('levelAssociatedCancerTypes', []))
+                
                 st.markdown(f"**{drugs}** - `{indication}`")
+                if cancer_types:
+                    st.markdown(f"**For Tumor Type(s):** {cancer_types}")
                 st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
 
     st.divider()
@@ -484,7 +492,6 @@ elif st.session_state.step == "results":
     oncokb_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
         oncokb_tabs = st.tabs(oncokb_tabs_list)
-        # **FIX:** Use enumerate to get a safe, sequential index `i` for the list
         for i, (df_index, row) in enumerate(df.iterrows()):
             with oncokb_tabs[i]:
                 display_oncokb_results(all_oncokb_data[i], row['Gene'], row['Alteration'])
@@ -508,7 +515,6 @@ elif st.session_state.step == "results":
         ai_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
         if ai_tabs_list:
             ai_tabs = st.tabs(ai_tabs_list)
-            # **FIX:** Use enumerate here as well for safety
             for i, (df_index, row) in enumerate(df.iterrows()):
                 with ai_tabs[i]:
                     gene = row['Gene']
