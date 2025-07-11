@@ -38,8 +38,16 @@ from urllib.parse import quote
 import pdfplumber
 import pytesseract
 from PIL import Image, ImageEnhance
-from llama_parse import LlamaParse
 import os
+
+# Gracefully handle ImportError if llama-parse is not installed correctly
+try:
+    from llama_parse import LlamaParse
+    llama_parse_available = True
+except ImportError:
+    LlamaParse = None
+    llama_parse_available = False
+
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -96,7 +104,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
     try:
         if 'csv' in filename or 'xls' in filename:
             df = pd.read_excel(file_bytes) if 'xls' in filename else pd.read_csv(io.BytesIO(file_bytes))
-            return (df, None) # The main logic will handle column mapping
+            return (df, None)
         
         elif 'pdf' in filename:
             variants = []
@@ -104,7 +112,6 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             full_extracted_text = ""
             line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense)\s+variant\s+(?:Details\s+)?([^\s,]+)')
             
-            # --- Method 1: pdfplumber + OCR ---
             debug_log += "Attempting Method 1: Standard OCR...\n"
             with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
                 for i, page in enumerate(pdf.pages):
@@ -128,11 +135,9 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                                 alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
                             variants.append({'Gene': gene, 'Alteration': alteration})
 
-            # --- Method 2: LlamaParse Fallback ---
-            if not variants and llama_api_key:
+            if not variants and llama_api_key and llama_parse_available:
                 debug_log += "\nMethod 1 failed. Attempting Method 2: LlamaParse...\n"
                 try:
-                    # LlamaParse needs the file path
                     with open("temp_report.pdf", "wb") as f:
                         f.write(file_bytes)
                     
@@ -149,7 +154,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                             if 'p.' in alteration.lower():
                                 alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
                             variants.append({'Gene': gene, 'Alteration': alteration})
-                    os.remove("temp_report.pdf") # Clean up temp file
+                    os.remove("temp_report.pdf")
                 except Exception as e:
                     debug_log += f"LlamaParse failed with error: {e}\n"
                     if os.path.exists("temp_report.pdf"):
@@ -299,12 +304,14 @@ if gemini_api_key:
 else:
     st.sidebar.warning("Gemini API key not found. Summary generation will be disabled.")
 
-# **ADDED:** LlamaParse API Key Check
-llama_api_key = st.secrets.get("LLAMA_CLOUD_API_KEY")
-if llama_api_key:
-    st.sidebar.success("LlamaParse API key found.")
+if llama_parse_available:
+    llama_api_key = st.secrets.get("LLAMA_CLOUD_API_KEY")
+    if llama_api_key:
+        st.sidebar.success("LlamaParse API key found.")
+    else:
+        st.sidebar.warning("LlamaParse API key not found. Advanced PDF parsing will be disabled.")
 else:
-    st.sidebar.warning("LlamaParse API key not found. Advanced PDF parsing will be disabled.")
+    st.sidebar.error("LlamaParse library not found. Advanced PDF parsing is disabled.")
 st.sidebar.divider()
 
 # --- Initialize Session State ---
@@ -356,22 +363,27 @@ if st.sidebar.button("Process Variants", type="primary"):
         st.session_state.nccn_data = parse_nccn_text(nccn_text)
         st.session_state.tumor_type = tumor_type
         
-        parsing_result = parse_molecular_report(report_file, llama_api_key)
+        parsing_result = parse_molecular_report(report_file, llama_api_key if llama_parse_available else None)
         if parsing_result is None:
             st.error("The file parser returned an unexpected error.")
         else:
             df, debug_log = parsing_result
             
-            if df is None or ('Gene' not in df.columns or 'Alteration' not in df.columns):
-                 st.session_state.raw_df = df
-                 st.session_state.column_selection_needed = True
-            elif df.empty:
+            # **FIX:** This new logic correctly routes different parsing outcomes.
+            if isinstance(df, pd.DataFrame) and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
+                # Success case
+                process_dataframe(df)
+            elif isinstance(df, pd.DataFrame) and ('Gene' not in df.columns or 'Alteration' not in df.columns):
+                # CSV/XLS needs column mapping
+                st.session_state.raw_df = df
+                st.session_state.column_selection_needed = True
+            else:
+                # PDF parsing failed or returned an empty dataframe
                 st.error("Could not parse any variants from the molecular report.")
                 if debug_log:
                     st.subheader("PDF/File Parsing Debug Log")
                     st.text_area("Log", debug_log, height=300)
-            else:
-                process_dataframe(df)
+
 
 # --- Interactive Column Selection UI ---
 if st.session_state.get('column_selection_needed', False):
@@ -469,4 +481,5 @@ elif not st.session_state.column_selection_needed:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
+
 
