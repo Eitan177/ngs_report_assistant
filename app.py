@@ -91,31 +91,23 @@ def parse_nccn_text(text):
 
 
 def extract_variants_from_text(text):
-    """
-    Helper function to extract variants from a block of text.
-    This version is more robust for OCR'd plain text.
-    """
+    """Helper function to extract variants from a block of text."""
     variants = []
-    # Regex to find a p. alteration, including those with '?' or OCR errors.
     alteration_re = re.compile(r'(p\.[A-Za-z0-9*?fs>_]+)', re.IGNORECASE)
     
     for line in text.split('\n'):
         line = line.strip()
         
-        # This regex looks for a gene-like word, then the word "variant", then details.
-        # It's designed to be flexible with the text between the gene and the alteration.
         line_match = re.search(r'\b([A-Z0-9]{2,10})\b\s+.*variant\s+(.*)', line, re.IGNORECASE)
         
         if line_match:
             gene = line_match.group(1)
             details = line_match.group(2)
             
-            # Now, find the specific p. alteration within the details part.
             alteration_match = alteration_re.search(details)
             if alteration_match:
                 alteration = alteration_match.group(1)
                 
-                # Final check to avoid capturing header words
                 if gene.upper() not in ['GENE', 'TYPE', 'DETAILS']:
                     variants.append({'Gene': gene, 'Alteration': alteration})
     return variants
@@ -137,29 +129,39 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             df = pd.read_excel(file_bytes) if 'xls' in filename else pd.read_csv(io.BytesIO(file_bytes))
             return (df, None)
         
-        elif 'pdf' in filename:
+        elif 'pdf' in filename or any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
             variants = []
-            debug_log = "--- PDF PARSING LOG ---\n"
+            debug_log = "--- PARSING LOG ---\n"
             full_extracted_text = ""
             
-            debug_log += "Attempting Method 1: Standard OCR...\n"
-            with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-                for i, page in enumerate(pdf.pages):
-                    page_text = page.extract_text()
-                    if not page_text or page_text.strip() == "":
-                        try:
-                            img = page.to_image(resolution=300).original
-                            img = img.convert('L')
-                            enhancer = ImageEnhance.Contrast(img)
-                            img = enhancer.enhance(2)
-                            page_text = pytesseract.image_to_string(img)
-                        except Exception:
-                            page_text = "" 
-                    
-                    full_extracted_text += page_text + "\n\n"
-                    variants.extend(extract_variants_from_text(page_text))
+            if 'pdf' in filename:
+                debug_log += "Attempting Method 1: Standard OCR on PDF...\n"
+                with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+                    for i, page in enumerate(pdf.pages):
+                        page_text = page.extract_text()
+                        if not page_text or page_text.strip() == "":
+                            try:
+                                img = page.to_image(resolution=300).original
+                                img = img.convert('L')
+                                enhancer = ImageEnhance.Contrast(img)
+                                img = enhancer.enhance(2)
+                                page_text = pytesseract.image_to_string(img)
+                            except Exception:
+                                page_text = "" 
+                        full_extracted_text += page_text + "\n\n"
+                variants.extend(extract_variants_from_text(full_extracted_text))
+            
+            elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
+                 debug_log += "Attempting OCR on Image...\n"
+                 img = Image.open(io.BytesIO(file_bytes))
+                 img = img.convert('L')
+                 enhancer = ImageEnhance.Contrast(img)
+                 img = enhancer.enhance(2)
+                 full_extracted_text = pytesseract.image_to_string(img)
+                 variants.extend(extract_variants_from_text(full_extracted_text))
 
-            if not variants and llama_api_key and llama_parse_available:
+
+            if not variants and llama_api_key and llama_parse_available and 'pdf' in filename:
                 debug_log += "\nMethod 1 failed. Attempting Method 2: LlamaParse...\n"
                 try:
                     with open("temp_report.pdf", "wb") as f:
@@ -184,28 +186,6 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             else:
                 debug_log += "\n--- FULL EXTRACTED TEXT (from last attempt) ---\n" + (full_extracted_text or "No text was extracted.")
                 return (pd.DataFrame(), debug_log)
-
-        elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
-            debug_log = "--- IMAGE PARSING LOG ---\n"
-            try:
-                img = Image.open(io.BytesIO(file_bytes))
-                img = img.convert('L')
-                enhancer = ImageEnhance.Contrast(img)
-                img = enhancer.enhance(2)
-                
-                text = pytesseract.image_to_string(img)
-                debug_log += f"Successfully extracted {len(text)} characters from image.\n"
-                
-                variants = extract_variants_from_text(text)
-                if variants:
-                    df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
-                    return (df, None)
-                else:
-                    debug_log += "\n--- FULL EXTRACTED TEXT ---\n" + text
-                    return (pd.DataFrame(), debug_log)
-            except Exception as e:
-                return (None, f"An error occurred during image processing: {e}")
-
 
     except Exception as e:
         return (None, f"A critical error occurred: {e}")
@@ -355,34 +335,31 @@ else:
 st.sidebar.divider()
 
 # --- Initialize Session State ---
+if 'step' not in st.session_state:
+    st.session_state.step = "initial"
 if 'results_df' not in st.session_state:
     st.session_state.results_df = pd.DataFrame()
 if 'narrative_summary' not in st.session_state:
     st.session_state.narrative_summary = ""
-if 'column_selection_needed' not in st.session_state:
-    st.session_state.column_selection_needed = False
-if 'raw_df' not in st.session_state:
-    st.session_state.raw_df = None
 
-
-def process_dataframe(df):
+def process_and_analyze(df):
     """The main logic for processing a finalized DataFrame."""
     st.session_state.results_df = df
-    st.session_state.column_selection_needed = False
+    st.session_state.step = "results"
     
-    st.success(f"Successfully parsed {len(df)} variants from the report.")
-    all_oncokb_data = []
-    for index, row in df.iterrows():
-        data = get_oncokb_data(row['Gene'], row['Alteration'], st.session_state.tumor_type, oncokb_api_token)
-        all_oncokb_data.append(data)
-    st.session_state.all_oncokb_data = all_oncokb_data
+    with st.spinner("Querying OncoKB for all variants..."):
+        all_oncokb_data = []
+        for index, row in df.iterrows():
+            data = get_oncokb_data(row['Gene'], row['Alteration'], st.session_state.tumor_type, oncokb_api_token)
+            all_oncokb_data.append(data)
+        st.session_state.all_oncokb_data = all_oncokb_data
 
 
 # --- Main Processing Logic ---
 if st.sidebar.button("Process Variants", type="primary"):
     st.session_state.narrative_summary = ""
     st.session_state.results_df = pd.DataFrame()
-    st.session_state.column_selection_needed = False
+    st.session_state.step = "initial"
     
     if report_file is None:
         st.warning("Please upload a molecular report file.")
@@ -411,11 +388,12 @@ if st.sidebar.button("Process Variants", type="primary"):
             
             is_tabular = any(ext in report_file.name.lower() for ext in ['.csv', '.xls'])
             
-            if df is not None and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
-                process_dataframe(df)
-            elif df is not None and is_tabular:
+            if df is not None and not df.empty:
                 st.session_state.raw_df = df
-                st.session_state.column_selection_needed = True
+                if is_tabular and ('Gene' not in df.columns or 'Alteration' not in df.columns):
+                    st.session_state.step = "column_selection"
+                else:
+                    st.session_state.step = "review"
             else:
                 st.error("Could not parse any variants from the molecular report.")
                 if debug_log:
@@ -423,8 +401,11 @@ if st.sidebar.button("Process Variants", type="primary"):
                     st.text_area("Log", debug_log, height=300)
 
 
-# --- Interactive Column Selection UI ---
-if st.session_state.get('column_selection_needed', False):
+# --- UI Display Logic ---
+if st.session_state.step == "initial":
+    st.info("Upload your files and click 'Process Variants' in the sidebar to begin.")
+
+elif st.session_state.step == "column_selection":
     st.warning("Could not automatically identify 'Gene' and 'Alteration' columns.")
     st.info("Please select the correct columns from your file below:")
     
@@ -444,27 +425,26 @@ if st.session_state.get('column_selection_needed', False):
         else:
             st.error("Please select both a Gene and an Alteration column.")
 
+elif st.session_state.step == "review":
+    st.header("Review and Edit Parsed Variants")
+    st.info("OCR is not always perfect. Please review the extracted variants below and correct any errors before proceeding.")
+    edited_df = st.data_editor(st.session_state.raw_df, num_rows="dynamic")
+    
+    if st.button("Confirm and Analyze Variants", type="primary"):
+        process_dataframe(edited_df)
+        st.rerun()
 
-# --- Sidebar Actions (Post-Processing) ---
-if not st.session_state.results_df.empty:
-    st.sidebar.header("3. Generate Summaries")
-    if st.sidebar.button("Generate Narrative Summary", disabled=(not gemini_api_key), key="gemini_summary"):
-        with st.spinner("Generating AI-powered summary..."):
-            summary = generate_narrative_summary(
-                st.session_state.all_oncokb_data, 
-                st.session_state.nccn_data, 
-                st.session_state.tumor_type, 
-                gemini_api_key
-            )
-            st.session_state.narrative_summary = summary
-
-
-# --- Display Results ---
-if not st.session_state.results_df.empty and not st.session_state.column_selection_needed:
+elif st.session_state.step == "results":
     df = st.session_state.results_df
     nccn_data = st.session_state.nccn_data
     tumor_type = st.session_state.tumor_type
     all_oncokb_data = st.session_state.all_oncokb_data
+
+    st.sidebar.header("3. Generate Summaries")
+    if st.sidebar.button("Generate Narrative Summary", disabled=(not gemini_api_key), key="gemini_summary"):
+        with st.spinner("Generating AI-powered summary..."):
+            summary = generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_api_key)
+            st.session_state.narrative_summary = summary
 
     if st.session_state.narrative_summary:
         st.header("Narrative Summary (Gemini)")
@@ -512,11 +492,7 @@ if not st.session_state.results_df.empty and not st.session_state.column_selecti
     else:
         st.warning("No variants found to generate AI aggregator links.")
 
-elif not st.session_state.column_selection_needed:
-    st.info("Upload your files and click 'Process Variants' in the sidebar to begin.")
-
 # Sample data for initial view if no file is uploaded
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
