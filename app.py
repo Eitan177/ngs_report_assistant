@@ -287,13 +287,9 @@ def display_oncokb_results(data_tuple, hugo_symbol, alteration):
     else:
         query = data.get('query', {})
         
-        link_alteration = alteration
-        # **FIX:** Correctly handle splice variant for link generation
-        if link_alteration.lower() == 'p.?':
-            link_alteration = 'X1000_splice'
-        elif link_alteration.lower().startswith('p.'):
-            link_alteration = link_alteration[2:]
-        oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{link_alteration}"
+        # **FIX:** Use the cleaned alteration from the query for the link
+        link_alteration = query.get('alteration', alteration)
+        oncokb_link = f"https://www.oncokb.org/gene/{query.get('hugoSymbol', hugo_symbol)}/{link_alteration}"
         
         st.markdown(f"**Tumor Type in Query:** `{query.get('tumorType', 'Not specified')}`")
         st.link_button("View on OncoKB", oncokb_link)
@@ -310,12 +306,13 @@ def display_oncokb_results(data_tuple, hugo_symbol, alteration):
                 indication = treatment.get('indication', {}).get('name', 'N/A')
                 pmids = ", ".join([f"[{pmid}](https://pubmed.ncbi.nlm.nih.gov/{pmid})" for pmid in treatment.get('pmids', [])])
                 
-                # **ADDED:** Display the associated cancer types for the treatment level
-                cancer_types = ", ".join(treatment.get('levelAssociatedCancerTypes', []))
+                # **FIX:** Correctly extract the tumor type name for the treatment level
+                cancer_type_info = treatment.get('levelAssociatedCancerType')
+                cancer_type_name = cancer_type_info.get('name') if cancer_type_info else None
                 
                 st.markdown(f"**{drugs}** - `{indication}`")
-                if cancer_types:
-                    st.markdown(f"**For Tumor Type(s):** {cancer_types}")
+                if cancer_type_name:
+                    st.markdown(f"**For Tumor Type(s):** {cancer_type_name}")
                 st.markdown(f"> :{get_level_class(treatment['level'])}[{level}] - {pmids}")
 
     st.divider()
