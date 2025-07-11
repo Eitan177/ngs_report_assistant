@@ -139,7 +139,6 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                 debug_log += "Attempting Method 1: Standard OCR on PDF...\n"
                 with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
                     for i, page in enumerate(pdf.pages):
-                        # Capture the first page image for review
                         if i == 0:
                             image_for_review = page.to_image(resolution=300).original
 
@@ -159,7 +158,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
                  debug_log += "Attempting OCR on Image...\n"
                  img = Image.open(io.BytesIO(file_bytes))
-                 image_for_review = img # Store the uploaded image for review
+                 image_for_review = img
                  img = img.convert('L')
                  enhancer = ImageEnhance.Contrast(img)
                  img = enhancer.enhance(2)
@@ -201,7 +200,11 @@ def parse_molecular_report(uploaded_file, llama_api_key):
 def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
     """Fetches data from the OncoKB API for a single variant."""
     api_alteration = alteration
-    if isinstance(api_alteration, str) and api_alteration.startswith('p.'):
+    
+    # **CHANGED:** Handle special case for splice variants and remove p. prefix case-insensitively
+    if api_alteration == 'p.?':
+        api_alteration = 'X1000_splice'
+    elif isinstance(api_alteration, str) and api_alteration.lower().startswith('p.'):
         api_alteration = api_alteration[2:]
 
     base_url = 'https://www.oncokb.org/api/v1' if api_token else 'https://demo.oncokb.org/api/v1'
@@ -391,7 +394,7 @@ if st.sidebar.button("Process Variants", type="primary"):
             st.error("The file parser returned an unexpected error.")
         else:
             df, debug_log, image_for_review = parsing_result
-            st.session_state.image_for_review = image_for_review # Store image for review screen
+            st.session_state.image_for_review = image_for_review
             
             is_tabular = any(ext in report_file.name.lower() for ext in ['.csv', '.xls'])
             
@@ -436,7 +439,6 @@ elif st.session_state.step == "review":
     st.header("Review and Edit Parsed Variants")
     st.info("OCR is not always perfect. Please review the extracted variants below and correct any errors before proceeding.")
     
-    # **ADDED:** Display the source image above the editable table
     if st.session_state.get('image_for_review'):
         st.image(st.session_state.image_for_review, caption="Source Image for Review")
         st.divider()
@@ -465,7 +467,8 @@ elif st.session_state.step == "results":
         st.divider()
 
     st.header("OncoKB Results")
-    oncokb_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
+    # **FIX:** Don't add 'p.' if it's already there
+    oncokb_tabs_list = [f"{row['Gene']} {row['Alteration'] if row['Alteration'].lower().startswith('p.') else 'p.' + row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
         oncokb_tabs = st.tabs(oncokb_tabs_list)
         for i, row in df.iterrows():
@@ -495,7 +498,7 @@ elif st.session_state.step == "results":
                 with ai_tabs[i]:
                     gene = row['Gene']
                     alt = row['Alteration']
-                    query_text = f"what is the clinical significance of {gene} {alt}"
+                    query_text = f"what is the clinical significance of {gene} {alt if alt.lower().startswith('p.') else 'p.' + alt}"
                     if tumor_type:
                         query_text += f" in {tumor_type}"
                     
@@ -505,7 +508,3 @@ elif st.session_state.step == "results":
     else:
         st.warning("No variants found to generate AI aggregator links.")
 
-# Sample data for initial view if no file is uploaded
-DEFAULT_VARIANTS_CSV = """Gene,Alteration
-JAK2,V617F
-"""
