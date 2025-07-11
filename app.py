@@ -96,6 +96,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
+        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -143,7 +144,8 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                     
                     parser = LlamaParse(api_key=llama_api_key, result_type="markdown")
                     documents = parser.load_data("temp_report.pdf")
-                    llama_text = documents[0].get_text()
+                    # **FIX:** Changed .get_text() to the correct .text attribute
+                    llama_text = documents[0].text
                     debug_log += f"LlamaParse successfully extracted {len(llama_text)} characters.\n"
                     full_extracted_text = llama_text
                     
@@ -369,18 +371,14 @@ if st.sidebar.button("Process Variants", type="primary"):
         else:
             df, debug_log = parsing_result
             
-            # **FIXED:** This new logic correctly routes different parsing outcomes.
             is_pdf = 'pdf' in report_file.name.lower()
             
             if df is not None and not df.empty and 'Gene' in df.columns and 'Alteration' in df.columns:
-                # Success case for PDF or correctly formatted CSV/XLS
                 process_dataframe(df)
             elif df is not None and not is_pdf:
-                # CSV/XLS needs column mapping
                 st.session_state.raw_df = df
                 st.session_state.column_selection_needed = True
             else:
-                # PDF parsing failed or returned an empty dataframe
                 st.error("Could not parse any variants from the molecular report.")
                 if debug_log:
                     st.subheader("PDF/File Parsing Debug Log")
