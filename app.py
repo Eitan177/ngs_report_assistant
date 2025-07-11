@@ -116,18 +116,19 @@ def extract_variants_from_text(text):
 def parse_molecular_report(uploaded_file, llama_api_key):
     """
     Parses the uploaded molecular report file.
-    Returns a tuple: (DataFrame, debug_log).
+    Returns a tuple: (DataFrame, debug_log, image_for_review).
     """
     if uploaded_file is None:
-        return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
+        return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None, None)
 
     filename = uploaded_file.name.lower()
     file_bytes = uploaded_file.getvalue()
+    image_for_review = None
     
     try:
         if 'csv' in filename or 'xls' in filename:
             df = pd.read_excel(file_bytes) if 'xls' in filename else pd.read_csv(io.BytesIO(file_bytes))
-            return (df, None)
+            return (df, None, None)
         
         elif 'pdf' in filename or any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
             variants = []
@@ -138,6 +139,10 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                 debug_log += "Attempting Method 1: Standard OCR on PDF...\n"
                 with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
                     for i, page in enumerate(pdf.pages):
+                        # Capture the first page image for review
+                        if i == 0:
+                            image_for_review = page.to_image(resolution=300).original
+
                         page_text = page.extract_text()
                         if not page_text or page_text.strip() == "":
                             try:
@@ -154,6 +159,7 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             elif any(ext in filename for ext in ['.png', '.jpg', '.jpeg']):
                  debug_log += "Attempting OCR on Image...\n"
                  img = Image.open(io.BytesIO(file_bytes))
+                 image_for_review = img # Store the uploaded image for review
                  img = img.convert('L')
                  enhancer = ImageEnhance.Contrast(img)
                  img = enhancer.enhance(2)
@@ -182,13 +188,13 @@ def parse_molecular_report(uploaded_file, llama_api_key):
 
             if variants:
                 df = pd.DataFrame(variants).drop_duplicates().reset_index(drop=True)
-                return (df, None)
+                return (df, None, image_for_review)
             else:
                 debug_log += "\n--- FULL EXTRACTED TEXT (from last attempt) ---\n" + (full_extracted_text or "No text was extracted.")
-                return (pd.DataFrame(), debug_log)
+                return (pd.DataFrame(), debug_log, image_for_review)
 
     except Exception as e:
-        return (None, f"A critical error occurred: {e}")
+        return (None, f"A critical error occurred: {e}", None)
 
 # --- API Call Functions ---
 @st.cache_data
@@ -342,7 +348,7 @@ if 'results_df' not in st.session_state:
 if 'narrative_summary' not in st.session_state:
     st.session_state.narrative_summary = ""
 
-def process_and_analyze(df):
+def process_dataframe(df):
     """The main logic for processing a finalized DataFrame."""
     st.session_state.results_df = df
     st.session_state.step = "results"
@@ -384,7 +390,8 @@ if st.sidebar.button("Process Variants", type="primary"):
         if parsing_result is None:
             st.error("The file parser returned an unexpected error.")
         else:
-            df, debug_log = parsing_result
+            df, debug_log, image_for_review = parsing_result
+            st.session_state.image_for_review = image_for_review # Store image for review screen
             
             is_tabular = any(ext in report_file.name.lower() for ext in ['.csv', '.xls'])
             
@@ -428,6 +435,12 @@ elif st.session_state.step == "column_selection":
 elif st.session_state.step == "review":
     st.header("Review and Edit Parsed Variants")
     st.info("OCR is not always perfect. Please review the extracted variants below and correct any errors before proceeding.")
+    
+    # **ADDED:** Display the source image above the editable table
+    if st.session_state.get('image_for_review'):
+        st.image(st.session_state.image_for_review, caption="Source Image for Review")
+        st.divider()
+
     edited_df = st.data_editor(st.session_state.raw_df, num_rows="dynamic")
     
     if st.button("Confirm and Analyze Variants", type="primary"):
