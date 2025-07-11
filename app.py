@@ -198,10 +198,12 @@ def parse_molecular_report(uploaded_file, llama_api_key):
 # --- API Call Functions ---
 @st.cache_data
 def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
-    """Fetches data from the OncoKB API for a single variant."""
+    """
+    Fetches data from the OncoKB API for a single variant.
+    Returns a tuple of (response_json, api_url) for debugging.
+    """
     api_alteration = alteration
     
-    # **CHANGED:** Handle special case for splice variants and remove p. prefix case-insensitively
     if api_alteration == 'p.?':
         api_alteration = 'X1000_splice'
     elif isinstance(api_alteration, str) and api_alteration.lower().startswith('p.'):
@@ -219,14 +221,14 @@ def get_oncokb_data(hugo_symbol, alteration, tumor_type, api_token):
     try:
         response = requests.get(api_url, headers=headers, verify=False)
         response.raise_for_status()
-        return response.json()
+        return (response.json(), api_url)
     except requests.exceptions.HTTPError as e:
         try:
-            return e.response.json()
+            return (e.response.json(), api_url)
         except ValueError:
-            return {'error': f"API Error: Status {e.response.status_code}"}
+            return ({'error': f"API Error: Status {e.response.status_code}"}, api_url)
     except requests.exceptions.RequestException as e:
-        return {'error': f"Network Error: {e}"}
+        return ({'error': f"Network Error: {e}"}, api_url)
 
 def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_api_key):
     """Generates a narrative summary using the Gemini API."""
@@ -236,9 +238,9 @@ def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_ap
     prompt_context += "**Source Data:**\n"
     
     prompt_context += "--- OncoKB Information ---\n"
-    for variant_data in all_oncokb_data:
-        if 'query' in variant_data and variant_data.get('geneExist', False):
-            prompt_context += json.dumps(variant_data, indent=2) + "\n\n"
+    for data, url in all_oncokb_data: # Unpack the tuple
+        if 'query' in data and data.get('geneExist', False):
+            prompt_context += json.dumps(data, indent=2) + "\n\n"
             
     prompt_context += "\n--- NCCN Guideline Information ---\n"
     for gene, info in nccn_data.items():
@@ -269,16 +271,26 @@ def generate_narrative_summary(all_oncokb_data, nccn_data, tumor_type, gemini_ap
 
 
 # --- UI Rendering Functions ---
-def display_oncokb_results(data, hugo_symbol, alteration):
+def display_oncokb_results(data_tuple, hugo_symbol, alteration):
     """Displays the formatted OncoKB results in a tab."""
     
+    data, api_url = data_tuple # Unpack the tuple
+    
+    st.markdown("**API Query Sent:**")
+    st.code(api_url, language="text")
+    st.divider()
+
     if 'error' in data:
         st.error(data['error'])
     elif data.get('query', {}).get('variant') == "UNKNOWN":
         st.warning("Variant not found in OncoKB.")
     else:
         query = data.get('query', {})
-        oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{alteration}"
+        
+        link_alteration = alteration
+        if link_alteration.lower().startswith('p.'):
+            link_alteration = link_alteration[2:]
+        oncokb_link = f"https://www.oncokb.org/gene/{hugo_symbol}/{link_alteration}"
         
         st.markdown(f"**Tumor Type in Query:** `{query.get('tumorType', 'Not specified')}`")
         st.link_button("View on OncoKB", oncokb_link)
@@ -359,8 +371,8 @@ def process_dataframe(df):
     with st.spinner("Querying OncoKB for all variants..."):
         all_oncokb_data = []
         for index, row in df.iterrows():
-            data = get_oncokb_data(row['Gene'], row['Alteration'], st.session_state.tumor_type, oncokb_api_token)
-            all_oncokb_data.append(data)
+            data_tuple = get_oncokb_data(row['Gene'], row['Alteration'], st.session_state.tumor_type, oncokb_api_token)
+            all_oncokb_data.append(data_tuple)
         st.session_state.all_oncokb_data = all_oncokb_data
 
 
@@ -467,8 +479,7 @@ elif st.session_state.step == "results":
         st.divider()
 
     st.header("OncoKB Results")
-    # **FIX:** Don't add 'p.' if it's already there
-    oncokb_tabs_list = [f"{row['Gene']} {row['Alteration'] if row['Alteration'].lower().startswith('p.') else 'p.' + row['Alteration']}" for index, row in df.iterrows()]
+    oncokb_tabs_list = [f"{row['Gene']} {row['Alteration']}" for index, row in df.iterrows()]
     if oncokb_tabs_list:
         oncokb_tabs = st.tabs(oncokb_tabs_list)
         for i, row in df.iterrows():
@@ -498,7 +509,7 @@ elif st.session_state.step == "results":
                 with ai_tabs[i]:
                     gene = row['Gene']
                     alt = row['Alteration']
-                    query_text = f"what is the clinical significance of {gene} {alt if alt.lower().startswith('p.') else 'p.' + alt}"
+                    query_text = f"what is the clinical significance of {gene} {alt}"
                     if tumor_type:
                         query_text += f" in {tumor_type}"
                     
@@ -507,4 +518,3 @@ elif st.session_state.step == "results":
                     st.link_button("Ask Perplexity.ai", perplexity_url)
     else:
         st.warning("No variants found to generate AI aggregator links.")
-
