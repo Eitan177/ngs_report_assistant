@@ -90,13 +90,41 @@ def parse_nccn_text(text):
     return nccn_data
 
 
+def extract_variants_from_text(text):
+    """Helper function to extract variants from a block of text, supporting Markdown tables."""
+    variants = []
+    # Regex to find a p. alteration, including those with '?'
+    alteration_re = re.compile(r'(p\.[A-Za-z0-9*?fs>_]+)')
+
+    for line in text.split('\n'):
+        line = line.strip()
+        
+        # **NEW LOGIC:** Specifically handle Markdown table rows
+        if line.startswith('|') and line.endswith('|'):
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) >= 4:
+                gene = parts[1]
+                details = parts[3]
+                
+                # Skip header/separator rows
+                if gene.upper() == 'GENE' or '---' in gene:
+                    continue
+
+                match = alteration_re.search(details)
+                if match:
+                    alteration = match.group(1)
+                    cleaned_gene = re.sub(r'[^A-Z0-9]', '', gene).upper()
+                    if cleaned_gene:
+                        variants.append({'Gene': cleaned_gene, 'Alteration': alteration})
+    return variants
+
+
 def parse_molecular_report(uploaded_file, llama_api_key):
     """
     Parses the uploaded molecular report file.
     Returns a tuple: (DataFrame, debug_log).
     """
     if uploaded_file is None:
-        # If no file is uploaded, use the default example data.
         return (pd.read_csv(io.StringIO(DEFAULT_VARIANTS_CSV)), None)
 
     filename = uploaded_file.name
@@ -111,7 +139,6 @@ def parse_molecular_report(uploaded_file, llama_api_key):
             variants = []
             debug_log = "--- PDF PARSING LOG ---\n"
             full_extracted_text = ""
-            line_finder_re = re.compile(r'\b([A-Z0-9]{2,10})\b\s+(?:Frameshift|Missense)\s+variant\s+(?:Details\s+)?([^\s,]+)')
             
             debug_log += "Attempting Method 1: Standard OCR...\n"
             with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
@@ -124,17 +151,11 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                             enhancer = ImageEnhance.Contrast(img)
                             img = enhancer.enhance(2)
                             page_text = pytesseract.image_to_string(img)
-                            full_extracted_text += page_text + "\n\n"
                         except Exception:
-                            continue
+                            page_text = "" # Ensure page_text is a string
                     
-                    for line in page_text.split('\n'):
-                        match = line_finder_re.search(line)
-                        if match:
-                            gene, alteration = match.group(1), match.group(2)
-                            if 'p.' in alteration.lower():
-                                alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
-                            variants.append({'Gene': gene, 'Alteration': alteration})
+                    full_extracted_text += page_text + "\n\n"
+                    variants.extend(extract_variants_from_text(page_text))
 
             if not variants and llama_api_key and llama_parse_available:
                 debug_log += "\nMethod 1 failed. Attempting Method 2: LlamaParse...\n"
@@ -144,18 +165,11 @@ def parse_molecular_report(uploaded_file, llama_api_key):
                     
                     parser = LlamaParse(api_key=llama_api_key, result_type="markdown")
                     documents = parser.load_data("temp_report.pdf")
-                    # **FIX:** Changed .get_text() to the correct .text attribute
                     llama_text = documents[0].text
                     debug_log += f"LlamaParse successfully extracted {len(llama_text)} characters.\n"
                     full_extracted_text = llama_text
                     
-                    for line in llama_text.split('\n'):
-                        match = line_finder_re.search(line)
-                        if match:
-                            gene, alteration = match.group(1), match.group(2)
-                            if 'p.' in alteration.lower():
-                                alteration = re.sub(r'.*p\.', '', alteration, flags=re.IGNORECASE)
-                            variants.append({'Gene': gene, 'Alteration': alteration})
+                    variants.extend(extract_variants_from_text(llama_text))
                     os.remove("temp_report.pdf")
                 except Exception as e:
                     debug_log += f"LlamaParse failed with error: {e}\n"
@@ -481,4 +495,3 @@ elif not st.session_state.column_selection_needed:
 DEFAULT_VARIANTS_CSV = """Gene,Alteration
 JAK2,V617F
 """
-
